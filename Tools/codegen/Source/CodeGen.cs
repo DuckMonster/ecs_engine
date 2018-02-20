@@ -22,7 +22,11 @@ namespace CodeGenerator
 			if (args.Length < 2)
 			{
 				Utils.Print("Usage: CodeGen source target [/G]\n  /G - Allow generating new files. Otherwise will error if new files have to be created.");
-				return 1;
+                Utils.Print("\nSupplied {0} arguments:", args.Length);
+                foreach(string arg in args)
+                    Utils.Print("\t{0}", arg);
+
+                return 1;
 			}
 
 			GenData = new GenerationData();

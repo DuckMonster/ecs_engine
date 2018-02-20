@@ -1,9 +1,9 @@
 -- premake5.lua
 workspace "ecs_engine"
-	location "build/"
+	location "Build/"
 	platforms { "x64" }
 	configurations { "Debug", "Release", "DebugServer", "ReleaseServer" }
-	targetdir "bin/%{prj.name}"
+	targetdir "Bin/%{prj.name}"
 	startproject "Game"
 
 project "Game"
@@ -21,8 +21,8 @@ project "Game"
 
 	files { 
 		-- Source files
-		"src/**.h", "src/**.hpp",
-		"src/**.cpp", "src/**.c", "src/**.inl",
+		"Source/**.h", "Source/**.hpp",
+		"src/**.cpp", "Soujce/**.c", "src/**.inl",
 		"obj/gen/**.h", "obj/gen/**.cpp",
 
 		-- Resource Files
@@ -31,33 +31,33 @@ project "Game"
 
 	vpaths {
 		[".generated"] = "**/gen/*",
-		["Code/*"] = { "src/*" },
+		["Code/*"] = { "Source/*" },
 		["Resource/*"] = { "Resource/* "}
 	}
 
 	systemversion "10.0.16299.0"
 
-	objdir "obj/"
+	objdir "Build/obj/"
 	targetsuffix "_%{cfg.buildcfg}"
 
 	pchheader "CorePCH.h"
-	pchsource "src/CorePCH.cpp"
+	pchsource "Source/CorePCH.cpp"
 
-	includedirs { "include", "D:/Programming/C++/!Common", "src" }
+	includedirs { "Dependency/include", "D:/Programming/C++/!Common", "Source" }
 
 	prebuildcommands {
-		"%{wks.location}..\\bin\\CodeGen\\CodeGen.exe %{wks.location}..\\src\\ %{wks.location}..\\obj\\gen\\"
+		"\"%{wks.location}..\\Bin\\CodeGen\\CodeGen.exe\" \"%{wks.location}..\\Source\" \"%{wks.location}gen\""
 	}
  	
 	filter "Release or ReleaseServer"
 		defines { "NDEBUG" }
 		optimize "On"
-		libdirs "lib/Release"
+		libdirs "Dependency/lib/Release"
 
 	filter "Debug or DebugServer"
 		defines { "_DEBUG", "DEBUG" }
 		symbols "On"
-		libdirs "lib/Debug"
+		libdirs "Dependency/lib/Debug"
 		
 	filter "Debug"
 		links { "glew32sd" }
@@ -81,12 +81,13 @@ group "Tools"
 
 		kind "ConsoleApp"
 		language "C#"
-		location "build/"
 
-		files { "tools/codegen/src/**.cs" }
+		objdir "Tools/codegen/Build/obj"
+
+		files { "Tools/codegen/Source/**.cs" }
 		vpaths { [""] = "**.cs" }
 
-		debugargs { "D:\\Programming\\C++\\DickEngine\\src D:\\Programming\\C++\\DickEngine\\obj\\gen" }
+		debugargs { "\"%{wks.location}..\\Source\" \"%{wks.location}gen\"" }
 
 		links { "System" }
 
