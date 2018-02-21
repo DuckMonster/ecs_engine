@@ -24,7 +24,7 @@ namespace CodeGenerator
 				return;
 			}
 
-			SourceFile file;
+			SourceFile file = new SourceFile();
 
 			file.FileName = Path.GetFileName(sourcePath);
 			file.FullPath = sourcePath;
@@ -98,7 +98,7 @@ namespace CodeGenerator
 				database.File = file;
 				database.ClassName = match[0].Groups[2].Value;
 
-				if (manifest.Database.ClassName != null)
+				if (manifest.Database != null)
 					CodeGen.Error("Multiple databases found: \"{0}\" and \"{1}\"", manifest.Database.ClassName, database.ClassName);
 
 				Match initMatch = TYPE_DB_INIT_RGX.Match(match[0].Groups[3].Value);

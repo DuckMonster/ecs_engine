@@ -10,16 +10,15 @@ namespace CodeGenerator
 	{
 		const string INCLUDE = "#include \"{0}\"";
 		const string NAMESPACE = "using namespace {0}";
-		const string FUNC = "{0} {1}::{2}( {3} )\r\n{{\r\n\tprintf(\"This is a generated function! Hello!\\n\");\r\n}}\r\n";
+		const string FUNC = "{0}\r\n{{\r\n\t// This is a generated function! Hello!\r\n{1}\r\n}}\r\n";
 		SourceFile file;
 
 		public SourceWriter(SourceFile file, Stream stream) : base(stream)
 		{
-            this.file = file;
+			this.file = file;
 
-			WriteInclude(file.FileName);
-			//foreach (string ns in file.Component.Namespaces)
-				//WriteNamespace(ns);
+			WriteInclude("CorePCH.h");
+			WriteInclude(file.FullPath);
 		}
 
 		public void WriteInclude(string file)
@@ -32,24 +31,58 @@ namespace CodeGenerator
 			WriteLine(NAMESPACE, file);
 		}
 
-		public void WriteFunction(Function func)
+		public void WriteFunction(Function func, string className, string source)
 		{
-			//WriteLine(FUNC, func.ReturnType, file.Component.Name, func.Name, func.Args);
+			source = IndentSource(source, 1);
+
+			if (className.Length > 0)
+				WriteLine(FUNC, func.Signature(className), source);
+			else
+				WriteLine(FUNC, func.Signature(), source);
 		}
 
 		public void WriteDatabase(TypeDatabase db, CodeGenerationManifest manifest)
 		{
+			const string REG_SIGNATURE = "{0}( \"{1}\", {2} );";
 
+			StringWriter writer = new StringWriter();
+
+			for(int i=0; i<manifest.Components.Count; ++i)
+			{
+				Component comp = manifest.Components[i];
+				writer.WriteLine(REG_SIGNATURE, "Register", comp.Name, i);
+			}
+			Function initFunc = new Function();
+			initFunc.Name = db.InitFuncName;
+			initFunc.ReturnType = "void";
+
+			WriteFunction(initFunc, db.ClassName, writer.ToString());
+		}
+
+		public void WriteComponent(Component component)
+		{
+			if (component.Functions != null)
+			{
+				foreach (Function func in component.Functions)
+					WriteFunction(func, component.Name, "");
+			}
+			if (component.GeneratedFunctions != null)
+			{
+				foreach (Function func in component.GeneratedFunctions)
+					WriteFunction(func, component.Name, func.Source);
+			}
 		}
 
 		static string IndentSource(string src, int indent)
 		{
 			string indentString = "";
+
 			for (int i = 0; i < indent; i++)
 				indentString += "\t";
-			indentString += "\n";
 
-			return src.Replace("\n", indentString);
+			src = src.Insert(0, indentString);
+
+			return src.Replace("\n", "\n" + indentString);
 		}
 	}
 }

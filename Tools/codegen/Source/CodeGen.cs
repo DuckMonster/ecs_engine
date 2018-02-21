@@ -22,11 +22,11 @@ namespace CodeGenerator
 			if (args.Length < 2)
 			{
 				Utils.Print("Usage: CodeGen source target [/G]\n  /G - Allow generating new files. Otherwise will error if new files have to be created.");
-                Utils.Print("\nSupplied {0} arguments:", args.Length);
-                foreach(string arg in args)
-                    Utils.Print("\t{0}", arg);
+				Utils.Print("\nSupplied {0} arguments:", args.Length);
+				foreach (string arg in args)
+					Utils.Print("\t{0}", arg);
 
-                return 1;
+				return 1;
 			}
 
 			GenData = new GenerationData();
@@ -54,13 +54,48 @@ namespace CodeGenerator
 				Utils.Print("Created directory \"{0}\"", GenData.TargetPath);
 			}
 
-			// Start generating
+			// Collect manifest
 			CodeGenerationManifest manifest = new CodeGenerationManifest();
 			manifest.Components = new List<Component>();
 
 			CollectDirectory(GenData.SourcePath, manifest);
-
 			manifest.Print();
+
+			// Process
+			foreach(Component comp in manifest.Components)
+			{
+				ComponentProcessor.Process(comp);
+			}
+
+			// Generate
+			foreach(Component comp in manifest.Components)
+			{
+				string genPath = Path.Combine(GenData.TargetPath, comp.File.GenFileName());
+
+				using (FileStream fileStream = new FileStream(genPath, FileMode.Create))
+				{
+					SourceWriter writer = new SourceWriter(comp.File, fileStream);
+
+					writer.WriteComponent(comp);
+
+					writer.Flush();
+					writer.Close();
+				}
+			}
+
+			{
+				string genPath = Path.Combine(GenData.TargetPath, manifest.Database.File.GenFileName());
+
+				using (FileStream fileStream = new FileStream(genPath, FileMode.Create))
+				{
+					SourceWriter writer = new SourceWriter(manifest.Database.File, fileStream);
+
+					writer.WriteDatabase(manifest.Database, manifest);
+
+					writer.Flush();
+					writer.Close();
+				}
+			}
 
 			return 0;
 
@@ -132,7 +167,7 @@ namespace CodeGenerator
 
 			// Get all header files
 			string[] files = Directory.GetFiles(dir);
-			foreach(string file in files)
+			foreach (string file in files)
 			{
 				if (Path.GetExtension(file) != ".h")
 					continue;

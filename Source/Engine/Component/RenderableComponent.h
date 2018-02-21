@@ -1,4 +1,5 @@
 #pragma once
+#include "Core/Meta/MetaData.h"
 #include "Core/Component/Component.h" 
 #include "Engine/Rendering/RenderTypes.h"
 
@@ -8,9 +9,9 @@ class RenderableComponent : public Component
 public:
 	RenderableComponent(Entity* entity) : Component(entity) {}
 
-	PROPERTY(EditorEditable)
+	PROPERTY(EditorEditable, Serialize)
 	GLuint m_VertexObject;
-	PROPERTY(EditorEditable, Replicated)
+	PROPERTY(EditorEditable, Replicated, Serialize)
 	GLuint m_ShaderProgram;
 
 	RenderFlag m_Flags;

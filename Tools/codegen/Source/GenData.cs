@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 
 namespace CodeGenerator
 {
-	struct SourceFile
+	class SourceFile
 	{
 		public string FileName;
 		public string FullPath;
@@ -25,59 +25,55 @@ namespace CodeGenerator
 		}
 	}
 
-	struct Parameter
+	class Parameter
 	{
 		public string Type;
 		public string Name;
 
-		public override string ToString() { return string.Format("[{0}] [{1}]", Type, Name); }
+		public override string ToString() { return string.Format("{0} {1}", Type, Name); }
+		public static string ParamaterListToString(Parameter[] paramList)
+		{
+			if (paramList == null)
+				return "";
+
+			string[] paramStrings = new string[paramList.Length];
+			for(int i=0; i<paramList.Length; ++i)
+			{
+				paramStrings[i] = paramList[i].ToString();
+			}
+
+			return string.Join(", ", paramStrings);
+		}
 	}
 
-	struct Function
+	class Function
 	{
 		public string Name;
 		public string ReturnType;
 		public Parameter[] Arguments;
 		public string[] MetaData;
+		public string Source;
 
 		public string Signature()
 		{
-			string result = ReturnType + " " + Name + "(";
-			string[] argStrings = new string[Arguments.Length];
-
-			for(int i=0; i<Arguments.Length; ++i)
-			{
-				argStrings[i] = Arguments[i].ToString();
-			}
-
-			result += string.Join(", ", argStrings) + ")";
-
+			string result = string.Format("{0} {1}( {2} )", ReturnType, Name, Parameter.ParamaterListToString(Arguments));
 			return result;
 		}
 
 		public string Signature(string className)
 		{
-			string result = ReturnType + " " + className + "::" + Name + "(";
-			string[] argStrings = new string[Arguments.Length];
-
-			for(int i=0; i<Arguments.Length; ++i)
-			{
-				argStrings[i] = Arguments[i].ToString();
-			}
-
-			result += string.Join(", ", argStrings) + ")";
-
+			string result = string.Format("{0} {1}::{2}( {3} )", ReturnType, className, Name, Parameter.ParamaterListToString(Arguments));
 			return result;
 		}
 	}
 
-	struct Property
+	class Property
 	{
 		public Parameter Parameter;
 		public string[] MetaData;
 	}
 
-	struct Component
+	class Component
 	{
 		public SourceFile File;
 		public string Name;
@@ -85,10 +81,20 @@ namespace CodeGenerator
 		public string[] MetaData;
 		public string[] Namespaces;
 		public Function[] Functions;
+		public Function[] GeneratedFunctions;
 		public Property[] Properties;
+
+		public bool HasFunction(string funcName)
+		{
+			foreach (Function func in Functions)
+				if (func.Name == funcName)
+					return true;
+
+			return false;
+		}
 	}
 
-	struct TypeDatabase
+	class TypeDatabase
 	{
 		public SourceFile File;
 		public string ClassName;

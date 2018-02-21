@@ -1,5 +1,4 @@
 #pragma once
-#include <stdio.h>
 #include <string>
 #include <vector>
 #include <map>
@@ -14,5 +13,5 @@
 #include <glm/gtc/matrix_access.hpp>
 #include <glm/gtx/quaternion.hpp>
 
-#include <Common/Debug.h>
 #include "Core/Core.h"
+#include <Common/Debug.h>
