@@ -18,10 +18,16 @@ namespace CodeGenerator
 			return Path.GetFileNameWithoutExtension(FileName);
 		}
 
-		public string GenFileName()
+		public string GenSrcFileName()
 		{
 			string name = StripExtension();
 			return name + ".gen.cpp";
+		}
+
+		public string GenHeaderFileName()
+		{
+			string name = StripExtension();
+			return name + ".gen.h";
 		}
 	}
 
@@ -83,6 +89,7 @@ namespace CodeGenerator
 		public Function[] Functions;
 		public Function[] GeneratedFunctions;
 		public Property[] Properties;
+		public int Id;
 
 		public bool HasFunction(string funcName)
 		{
@@ -98,7 +105,8 @@ namespace CodeGenerator
 	{
 		public SourceFile File;
 		public string ClassName;
-		public string InitFuncName;
+		public Function InitFunction;
+		public Function RegisterFunction;
 	}
 
 	class CodeGenerationManifest
@@ -112,42 +120,43 @@ namespace CodeGenerator
 
 		public void Print()
 		{
-			Utils.Print("--- MANIFEST ---");
-			Utils.Print("Components [{0}]", Components.Count);
+			Utils.PrintVerbal("--- MANIFEST ---");
+			Utils.PrintVerbal("Components [{0}]", Components.Count);
 			foreach (Component c in Components)
 			{
-				Utils.Print("- {0}", c.Name);
-				Utils.Print("File: {0}", c.File.FileName);
-				Utils.Print("Parent: {0}", c.Parent);
-				Utils.Print("Metadata: {0}", string.Join(", ", c.MetaData));
-				Utils.Print("Namespaces: {0}", string.Join(", ", c.Namespaces));
+				Utils.PrintVerbal("- {0}", c.Name);
+				Utils.PrintVerbal("File: {0}", c.File.FileName);
+				Utils.PrintVerbal("Parent: {0}", c.Parent);
+				Utils.PrintVerbal("Metadata: {0}", string.Join(", ", c.MetaData));
+				Utils.PrintVerbal("Namespaces: {0}", string.Join(", ", c.Namespaces));
 
 				if (c.Functions != null)
 				{
-					Utils.Print("Functions: [{0}]", c.Functions.Length);
+					Utils.PrintVerbal("Functions: [{0}]", c.Functions.Length);
 					foreach (Function func in c.Functions)
 					{
-						Utils.Print("Metadata: {0}", string.Join(", ", func.MetaData));
-						Utils.Print(func.Signature(c.Name));
+						Utils.PrintVerbal("Metadata: {0}", string.Join(", ", func.MetaData));
+						Utils.PrintVerbal(func.Signature(c.Name));
 					}
 				}
 
 				if (c.Properties != null)
 				{
-					Utils.Print("Properties [{0}]: ", c.Properties.Length);
+					Utils.PrintVerbal("Properties [{0}]: ", c.Properties.Length);
 					foreach (Property prop in c.Properties)
 					{
-						Utils.Print("Metadata: {0}", string.Join(", ", prop.MetaData));
-						Utils.Print(prop.Parameter.ToString());
+						Utils.PrintVerbal("Metadata: {0}", string.Join(", ", prop.MetaData));
+						Utils.PrintVerbal(prop.Parameter.ToString());
 					}
 				}
 			}
 
-			Utils.Print("\n\n");
-			Utils.Print("- Database");
-			Utils.Print("Class Name: {0}", Database.ClassName);
-			Utils.Print("File: {0}", Database.File.FileName);
-			Utils.Print("InitFunction: {0}", Database.InitFuncName);
+			Utils.PrintVerbal("\n\n");
+			Utils.PrintVerbal("- Database");
+			Utils.PrintVerbal("Class Name: {0}", Database.ClassName);
+			Utils.PrintVerbal("File: {0}", Database.File.FileName);
+			Utils.PrintVerbal("InitFunction: {0}", Database.InitFunction.Name);
+			Utils.PrintVerbal("RegisterFunction: {0}", Database.RegisterFunction.Name);
 		}
 	}
 }

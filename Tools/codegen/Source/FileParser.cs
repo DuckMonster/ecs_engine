@@ -14,7 +14,6 @@ namespace CodeGenerator
 		static Regex PROP_RGX = new Regex(@"\sPROPERTY\s*\(\s*([\w\s,]*)\s*\)\W*(.*?);");
 
 		static Regex TYPE_DB_RGX = new Regex(@"\s_TYPE_DATABASE\(\s*([\w\s,]*?)\s*\)\n?\s*class (.+).*\n((\s*){(?:.*\n)*?\4})");
-		static Regex TYPE_DB_INIT_RGX = new Regex(@"\s_DATABASE_INIT_FUNC\s*\(\s*\)\W*.+\s+(\w+)\s*\(\s*[\w\s,&*:]*\s*\)");
 
 		public static void Parse(string sourcePath, CodeGenerationManifest manifest)
 		{
@@ -30,7 +29,7 @@ namespace CodeGenerator
 			file.FullPath = sourcePath;
 			file.Source = File.ReadAllText(sourcePath).Replace("\r", "");
 
-			Utils.Print("\n-------------- Parsing \"{0}\" ------------------\n", file.FileName);
+			Utils.PrintVerbal("\n-------------- Parsing \"{0}\" ------------------\n", file.FileName);
 
 			// ----------------------------- Collect Components
 			MatchCollection match = COMP_RGX.Matches(file.Source);
@@ -45,6 +44,7 @@ namespace CodeGenerator
 				comp.Parent = match[0].Groups[3].Value;
 				comp.MetaData = metadata;
 				comp.Namespaces = namespaces;
+				comp.Id = manifest.Components.Count;
 
 				// Parse functions
 				{
@@ -86,7 +86,7 @@ namespace CodeGenerator
 					comp.Properties = compProperties;
 				}
 
-				Utils.Print("Parsed component \"{0}\"...", comp.Name);
+				Utils.PrintVerbal("Parsed component \"{0}\"...", comp.Name);
 				manifest.Components.Add(comp);
 			}
 
@@ -98,16 +98,34 @@ namespace CodeGenerator
 				database.File = file;
 				database.ClassName = match[0].Groups[2].Value;
 
-				if (manifest.Database != null)
-					CodeGen.Error("Multiple databases found: \"{0}\" and \"{1}\"", manifest.Database.ClassName, database.ClassName);
+				{
+					Function initFunction = new Function();
+					initFunction.Name = "InitializeTypes";
+					initFunction.ReturnType = "void";
 
-				Match initMatch = TYPE_DB_INIT_RGX.Match(match[0].Groups[3].Value);
-				if (!initMatch.Success)
-					CodeGen.Error("Type database \"{0}\" (\"{1}\") without an init function", database.ClassName, file.FileName);
+					database.InitFunction = initFunction;
+				}
 
-				database.InitFuncName = initMatch.Groups[1].Value;
+				{
+					Function regFunction = new Function();
+					regFunction.Name = "RegisterType";
+					regFunction.ReturnType = "void";
 
-				Utils.Print("Parsed database \"{0}\"...", database.ClassName);
+					Parameter name = new Parameter(),
+						id = new Parameter();
+
+					name.Type = "const char*";
+					name.Name = "name";
+
+					id.Type = "id_t";
+					id.Name = "id";
+
+					regFunction.Arguments = new Parameter[] { name, id };
+
+					database.RegisterFunction = regFunction;
+				}
+
+				Utils.PrintVerbal("Parsed database \"{0}\"...", database.ClassName);
 				manifest.Database = database;
 			}
 		}
@@ -151,7 +169,7 @@ namespace CodeGenerator
 			// Generate database
 			{
 				TypeDatabase db = manifest.Database;
-				string fullpath = path + db.File.GenFileName();
+				string fullpath = path + db.File.GenSrcFileName();
 
 				if (!File.Exists(fullpath) && !CodeGen.GenData.CanGenerate)
 					CodeGen.Error("File \"{0}\" does not exists in update mode", fullpath);

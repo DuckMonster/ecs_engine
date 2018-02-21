@@ -11,6 +11,7 @@ namespace CodeGenerator
 		public string SourcePath;
 		public string TargetPath;
 		public bool CanGenerate;
+		public bool Verbal;
 	}
 
 	class CodeGen
@@ -21,7 +22,7 @@ namespace CodeGenerator
 		{
 			if (args.Length < 2)
 			{
-				Utils.Print("Usage: CodeGen source target [/G]\n  /G - Allow generating new files. Otherwise will error if new files have to be created.");
+				Utils.Print("Usage: CodeGen source target [/G] [/V]\n  /G - Allow generating new files. Otherwise will error if new files have to be created.\n  /V - Verbal, will display additional debug information.");
 				Utils.Print("\nSupplied {0} arguments:", args.Length);
 				foreach (string arg in args)
 					Utils.Print("\t{0}", arg);
@@ -33,6 +34,7 @@ namespace CodeGenerator
 			GenData.SourcePath = Path.GetFullPath(args[0]);
 			GenData.TargetPath = Path.GetFullPath(args[1]);
 			GenData.CanGenerate = args.Contains("/G");
+			GenData.Verbal = args.Contains("/V");
 
 			if (Path.HasExtension(GenData.SourcePath) || Path.HasExtension(GenData.TargetPath))
 			{
@@ -46,12 +48,13 @@ namespace CodeGenerator
 				return 1;
 			}
 
-			Utils.Print("-- GENERATING FILES --\n\"{0}\" => \"{1}\"\nCanGenerate: {2}", GenData.SourcePath, GenData.TargetPath, GenData.CanGenerate);
+			Utils.Print("-- GENERATING FILES --\n\"{0}\" => \"{1}\"", GenData.SourcePath, GenData.TargetPath, GenData.CanGenerate);
+			Utils.PrintVerbal("CanGenerate: {2}", GenData.SourcePath, GenData.TargetPath, GenData.CanGenerate);
 
 			if (!Directory.Exists(GenData.TargetPath))
 			{
 				Directory.CreateDirectory(GenData.TargetPath);
-				Utils.Print("Created directory \"{0}\"", GenData.TargetPath);
+				Utils.PrintVerbal("Created directory \"{0}\"", GenData.TargetPath);
 			}
 
 			// Collect manifest
@@ -59,32 +62,57 @@ namespace CodeGenerator
 			manifest.Components = new List<Component>();
 
 			CollectDirectory(GenData.SourcePath, manifest);
+
 			manifest.Print();
 
 			// Process
 			foreach(Component comp in manifest.Components)
 			{
-				ComponentProcessor.Process(comp);
+				Process.ProcessComponent(comp, manifest);
 			}
+
+			Process.ProcessDatabase(manifest.Database, manifest);
 
 			// Generate
 			foreach(Component comp in manifest.Components)
 			{
-				string genPath = Path.Combine(GenData.TargetPath, comp.File.GenFileName());
-
-				using (FileStream fileStream = new FileStream(genPath, FileMode.Create))
+				// Source
 				{
-					SourceWriter writer = new SourceWriter(comp.File, fileStream);
+					string genPath = Path.Combine(GenData.TargetPath, comp.File.GenSrcFileName());
 
-					writer.WriteComponent(comp);
+					using (FileStream fileStream = new FileStream(genPath, FileMode.Create))
+					{
+						SourceWriter writer = new SourceWriter(comp.File, fileStream);
 
-					writer.Flush();
-					writer.Close();
+						writer.WriteComponent(comp);
+
+						writer.Flush();
+						writer.Close();
+
+						Utils.Print(comp.File.GenSrcFileName());
+					}
+				}
+
+				// Header
+				{
+					string genPath = Path.Combine(GenData.TargetPath, comp.File.GenHeaderFileName());
+
+					using (FileStream fileStream = new FileStream(genPath, FileMode.Create))
+					{
+						HeaderWriter writer = new HeaderWriter(comp.File, fileStream);
+
+						writer.WriteComponent(comp);
+
+						writer.Flush();
+						writer.Close();
+
+						Utils.Print(comp.File.GenHeaderFileName());
+					}
 				}
 			}
 
 			{
-				string genPath = Path.Combine(GenData.TargetPath, manifest.Database.File.GenFileName());
+				string genPath = Path.Combine(GenData.TargetPath, manifest.Database.File.GenSrcFileName());
 
 				using (FileStream fileStream = new FileStream(genPath, FileMode.Create))
 				{
@@ -94,68 +122,14 @@ namespace CodeGenerator
 
 					writer.Flush();
 					writer.Close();
+
+					Utils.Print(manifest.Database.File.GenSrcFileName());
 				}
 			}
 
+			Utils.Print("-- GENERATION DONE --");
+
 			return 0;
-
-			//List<Component> components = new List<Component>();
-
-			//// File
-			//if (Path.HasExtension(path))
-			//{
-			//	if (!File.Exists(path))
-			//		Error("Couldn't find file \"{0}\"", path);
-
-			//	Utils.Print("Generating code for file \"{0}\"...", path);
-			//	Component[] parsedComponents = Component.Parse(path);
-			//		components.AddRange(parsedComponents);
-
-			//	path = Path.GetDirectoryName(path);
-			//}
-
-			//// Directory
-			//else
-			//{
-			//	if (!Directory.Exists(path))
-			//		Error("Couldn't open directory \"{0}\"", path);
-
-			//	Utils.Print("Generating code for files in \"{0}\"...", path);
-
-			//	string[] files = Directory.GetFiles(path);
-
-			//	foreach (string file in files)
-			//	{
-			//		Component[] parsedComponents = Component.Parse(file);
-			//		components.AddRange(parsedComponents);
-			//	}
-			//}
-
-			//Utils.Print("\n---- PARSE FINISHED ----\n");
-			//Utils.Print("Cleaning directory...");
-
-			//string genDir = Path.Combine(path, ".gen\\");
-
-			//if (!Directory.Exists(genDir))
-			//	Directory.CreateDirectory(genDir);
-
-			//DirectoryInfo info = new DirectoryInfo(genDir);
-
-			//// Don't clean if folder contains subdirectories! This probably means bad path...
-			//if (info.GetDirectories().Count() > 0)
-			//	Error("Directory \"{0}\" contains sub-directories, aboring for safety...", genDir);
-
-			//// Delete em all
-			//foreach (FileInfo file in info.GetFiles())
-			//	file.Delete();
-
-			//// Generate
-			//foreach (Component component in components)
-			//	component.Generate(genDir);
-
-			//Utils.Print("Done!");
-
-			//return 0;
 		}
 
 		static void CollectDirectory(string dir, CodeGenerationManifest manifest)

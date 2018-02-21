@@ -44,5 +44,13 @@ namespace CodeGenerator
 			Console.WriteLine(format, args);
 			Debug.WriteLine(format, args);
 		}
+
+		public static void PrintVerbal(string format, params object[] args)
+		{
+			if (!CodeGen.GenData.Verbal)
+				return;
+
+			Print(format, args);
+		}
 	}
 }

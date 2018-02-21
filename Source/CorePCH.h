@@ -1,8 +1,10 @@
 #pragma once
+#include <stdio.h>
 #include <string>
 #include <vector>
 #include <map>
 #include <sstream>
+#include <unordered_map>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -13,5 +15,6 @@
 #include <glm/gtc/matrix_access.hpp>
 #include <glm/gtx/quaternion.hpp>
 
-#include "Core/Core.h"
 #include <Common/Debug.h>
+#include "Core/Utils/Types.h"
+#include "Core/Core.h"

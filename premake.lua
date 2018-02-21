@@ -22,8 +22,8 @@ project "Game"
 	files { 
 		-- Source files
 		"Source/**.h", "Source/**.hpp",
-		"src/**.cpp", "Soujce/**.c", "src/**.inl",
-		"obj/gen/**.h", "obj/gen/**.cpp",
+		"Source/**.cpp", "Source/**.c", "Source/**.inl",
+		"Build/gen/**.h", "Build/gen/**.cpp",
 
 		-- Resource Files
 		"Resource/**.*"
@@ -43,7 +43,7 @@ project "Game"
 	pchheader "CorePCH.h"
 	pchsource "Source/CorePCH.cpp"
 
-	includedirs { "Dependency/include", "D:/Programming/C++/!Common", "Source" }
+	includedirs { "Dependency/include", "D:/Personal/Programming/C++/!Common", "Source", "Build/gen" }
 
 	prebuildcommands {
 		"\"%{wks.location}..\\Bin\\CodeGen\\CodeGen.exe\" \"%{wks.location}..\\Source\" \"%{wks.location}gen\""

@@ -1,6 +1,7 @@
 #pragma once
 #include <string.h>
 #include <vector>
+#include <stdarg.h>
 
 namespace StringUtils
 {

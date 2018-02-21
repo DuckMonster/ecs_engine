@@ -15,12 +15,6 @@ void TransformComponent::LookAt(const glm::vec3& lookAtLocation, const glm::vec3
 	result[2] = r;
 
 	m_Rotation = quat(result);
-
-	Debug_Log("LookAt {%f, %f, %f} -> {%f, %f, %f} = {%f | %f, %f, %f}",
-		m_Position.x, m_Position.y, m_Position.z,
-		lookAtLocation.x, lookAtLocation.y, lookAtLocation.z,
-		m_Rotation.w, m_Rotation.x, m_Rotation.y, m_Rotation.z
-	);
 }
 
 glm::vec3 TransformComponent::GetForward() const

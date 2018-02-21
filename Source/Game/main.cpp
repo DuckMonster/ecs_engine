@@ -4,6 +4,7 @@
 #include <chrono>
 #include "Core/World/World.h"
 #include "Core/Context/Context.h"
+#include "Core/Component/ComponentType.h"
 
 void HandleKeyEvent(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
@@ -44,6 +45,9 @@ int main(int argv, char** argc)
 	context->height = 768;
 	glfwGetWindowPos(window, &context->width, &context->height);
 	glfwGetFramebufferSize(window, &context->width, &context->height);
+
+	//--------------------------------------------------- Init components
+	ComponentType::InitializeTypes();
 
 	//--------------------------------------------------- Main loop
 	World world;
