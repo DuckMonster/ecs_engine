@@ -74,57 +74,55 @@ namespace CodeGenerator
 			Process.ProcessDatabase(manifest.Database, manifest);
 
 			// Generate
-			foreach(Component comp in manifest.Components)
+			if (GenData.CanGenerate)
 			{
-				// Source
+				// If generate is enabled, clean the directory first
+				string[] files = Directory.GetFiles(GenData.TargetPath);
+				foreach(string file in files)
 				{
-					string genPath = Path.Combine(GenData.TargetPath, comp.File.GenSrcFileName());
-
-					using (FileStream fileStream = new FileStream(genPath, FileMode.Create))
-					{
-						SourceWriter writer = new SourceWriter(comp.File, fileStream);
-
-						writer.WriteComponent(comp);
-
-						writer.Flush();
-						writer.Close();
-
-						Utils.Print(comp.File.GenSrcFileName());
-					}
-				}
-
-				// Header
-				{
-					string genPath = Path.Combine(GenData.TargetPath, comp.File.GenHeaderFileName());
-
-					using (FileStream fileStream = new FileStream(genPath, FileMode.Create))
-					{
-						HeaderWriter writer = new HeaderWriter(comp.File, fileStream);
-
-						writer.WriteComponent(comp);
-
-						writer.Flush();
-						writer.Close();
-
-						Utils.Print(comp.File.GenHeaderFileName());
-					}
+					File.Delete(file);
 				}
 			}
 
+			foreach (Component comp in manifest.Components)
 			{
-				string genPath = Path.Combine(GenData.TargetPath, manifest.Database.File.GenSrcFileName());
-
-				using (FileStream fileStream = new FileStream(genPath, FileMode.Create))
+				// Source
+				using (FileStream fileStream = OpenSource(comp.File))
 				{
-					SourceWriter writer = new SourceWriter(manifest.Database.File, fileStream);
+					SourceWriter writer = new SourceWriter(comp.File, fileStream);
 
-					writer.WriteDatabase(manifest.Database, manifest);
+					writer.WriteComponent(comp);
 
 					writer.Flush();
 					writer.Close();
 
-					Utils.Print(manifest.Database.File.GenSrcFileName());
+					Utils.Print(comp.File.GenSrcFileName());
 				}
+
+				// Header
+				using (FileStream fileStream = OpenHeader(comp.File))
+				{
+					HeaderWriter writer = new HeaderWriter(comp.File, fileStream);
+
+					writer.WriteComponent(comp);
+
+					writer.Flush();
+					writer.Close();
+
+					Utils.Print(comp.File.GenHeaderFileName());
+				}
+			}
+
+			using (FileStream fileStream = OpenSource(manifest.Database.File))
+			{
+				SourceWriter writer = new SourceWriter(manifest.Database.File, fileStream);
+
+				writer.WriteDatabase(manifest.Database, manifest);
+
+				writer.Flush();
+				writer.Close();
+
+				Utils.Print(manifest.Database.File.GenSrcFileName());
 			}
 
 			Utils.Print("-- GENERATION DONE --");
@@ -155,13 +153,38 @@ namespace CodeGenerator
 				CollectDirectory(child, manifest);
 		}
 
-		public static void Error(string error, params string[] args)
+		public static void Error(string file, string error, params string[] args)
 		{
+			ConsoleColor prevColor = Console.ForegroundColor;
 			Console.ForegroundColor = ConsoleColor.Red;
-			Utils.Print("ERROR: {0}", string.Format(error, args));
-			Debugger.Break();
 
-			Environment.Exit(0);
+			if (file.Length > 0)
+				Utils.Print("ERROR ({0}): {1}", file, string.Format(error, args));
+			else
+				Utils.Print("ERROR: {0}", string.Format(error, args));
+
+			Console.ForegroundColor = prevColor;
+			Environment.Exit(10);
+		}
+
+		static FileStream OpenSource(SourceFile file)
+		{
+			string genPath = Path.Combine(GenData.TargetPath, file.GenSrcFileName());
+
+			if (!GenData.CanGenerate && !File.Exists(genPath))
+				Error("", "File \"{0}\" doesn't exist, and CanGenerate is false. Remake the project.", file.GenSrcFileName());
+
+			return new FileStream(genPath, FileMode.Create);
+		}
+
+		static FileStream OpenHeader(SourceFile file)
+		{
+			string genPath = Path.Combine(GenData.TargetPath, file.GenHeaderFileName());
+
+			if (!GenData.CanGenerate && !File.Exists(genPath))
+				Error("", "File \"{0}\" doesn't exist, and CanGenerate is false. Remake the project.", file.GenHeaderFileName());
+
+			return new FileStream(genPath, FileMode.Create);
 		}
 	}
 }

@@ -125,17 +125,18 @@ void World::DoFrame(float delta)
 *******************************************************************************/
 void World::PrintWorld()
 {
-	std::stringstream builder;
-
-	builder << "\n";
-	builder << "--- WORLD DUMP\n";
+	Debug_Log("\n");
+	Debug_Log("--- WORLD DUMP\n");
 
 	for(Entity* entity : m_EntityList)
 	{
-		builder << entity->GetName().c_str() << "\n";
+		Debug_Log(entity->GetName().c_str());
+
+		for (Component* comp : entity->GetAllComponents())
+			comp->DebugPrint();
 	}
 
-	Debug_Log(builder.str().c_str());
+	Debug_Log("--- WORLD END");
 }
 
 void World::RunSystems()

@@ -31,7 +31,7 @@ namespace CodeGenerator
 		}
 	}
 
-	class Parameter
+	struct Parameter
 	{
 		public string Type;
 		public string Name;
@@ -59,23 +59,29 @@ namespace CodeGenerator
 		public Parameter[] Arguments;
 		public string[] MetaData;
 		public string Source;
+		public string PreSpecifiers;
+		public string PostSpecifiers;
+		public string AccessSpecifier;
 
 		public string Signature()
 		{
-			string result = string.Format("{0} {1}( {2} )", ReturnType, Name, Parameter.ParamaterListToString(Arguments));
+			string result = string.Format("{0}: {1} {2} {3}( {4} ) {5}", AccessSpecifier, PreSpecifiers, ReturnType, Name, Parameter.ParamaterListToString(Arguments), PostSpecifiers);
 			return result;
 		}
 
-		public string Signature(string className)
+		public string Implemenatation(string className = "")
 		{
-			string result = string.Format("{0} {1}::{2}( {3} )", ReturnType, className, Name, Parameter.ParamaterListToString(Arguments));
-			return result;
+			if (className == "")
+				return string.Format("{0} {1}( {2} )", ReturnType, Name, Parameter.ParamaterListToString(Arguments));
+			else
+				return string.Format("{0} {1}::{2}( {3} )", ReturnType, className, Name, Parameter.ParamaterListToString(Arguments));
 		}
 	}
 
 	class Property
 	{
 		public Parameter Parameter;
+		public string CleanName;
 		public string[] MetaData;
 	}
 
@@ -136,7 +142,7 @@ namespace CodeGenerator
 					foreach (Function func in c.Functions)
 					{
 						Utils.PrintVerbal("Metadata: {0}", string.Join(", ", func.MetaData));
-						Utils.PrintVerbal(func.Signature(c.Name));
+						Utils.PrintVerbal(func.Signature());
 					}
 				}
 

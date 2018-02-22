@@ -5,50 +5,80 @@ namespace CodeGenerator
 {
 	class Process
 	{
+		static Parameter ConstructParameter(string type, string name)
+		{
+			Parameter result = new Parameter();
+			result.Type = type;
+			result.Name = name;
+
+			return result;
+		}
+
+		static Function ConstructFunction(string accessSpecifier, string returnType, string name, string preSpecifiers, string postSpecifiers, string source, params Parameter[] args)
+		{
+			Function func = new Function();
+			func.ReturnType = returnType;
+			func.Name = name;
+			func.PreSpecifiers = preSpecifiers;
+			func.PostSpecifiers = postSpecifiers;
+			func.Source = source;
+			func.Arguments = args;
+			func.AccessSpecifier = accessSpecifier;
+
+			return func;
+		}
+
 		public static void ProcessComponent(Component comp, CodeGenerationManifest manifest)
 		{
 			//---------- Serialize Function
-			if (comp.HasFunction("Serialize"))
-				return;
-
-			Function serializeFunction = new Function();
-			serializeFunction.Name = "Serialize";
-			serializeFunction.ReturnType = "void";
-
-			Parameter archiveParameter = new Parameter();
-			archiveParameter.Name = "archive";
-			archiveParameter.Type = "IArchive*";
-
-			serializeFunction.Arguments = new Parameter[] { archiveParameter };
+			string serializeSource = "",
+				initializeSource = "",
+				staticTypeSource = "";
 
 			{
-				const string SERIALIZE_FORMAT = "archive.Serialize<{0}>(&{1});";
+				const string SERIALIZE_FORMAT = "archive->Serialize<{0}>(\"{1}\", &{2});";
 				StringWriter sourceWriter = new StringWriter();
+
+				sourceWriter.WriteLine("{0}::Serialize( archive );", comp.Parent);
 
 				foreach (Property prop in comp.Properties)
 				{
 					if (Array.IndexOf(prop.MetaData, "Serialize") == -1)
 						continue;
 
-					sourceWriter.WriteLine(SERIALIZE_FORMAT, prop.Parameter.Type, prop.Parameter.Name);
+					sourceWriter.WriteLine(SERIALIZE_FORMAT, prop.Parameter.Type, prop.CleanName, prop.Parameter.Name);
 				}
 
-				serializeFunction.Source = sourceWriter.ToString();
+				serializeSource = sourceWriter.ToString();
 			}
 
 			//---------- Initialize function
-			Function initializeFunction = new Function();
-			initializeFunction.Name = "Initialize";
-			initializeFunction.ReturnType = "void";
-
 			{
 				StringWriter sourceWriter = new StringWriter();
+				sourceWriter.WriteLine("{0}::Initialize();", comp.Parent, comp.Id);
 				sourceWriter.WriteLine("m_Type = {0}::FromId( {1} );", manifest.Database.ClassName, comp.Id);
 
-				initializeFunction.Source = sourceWriter.ToString();
+				foreach (Property prop in comp.Properties)
+					sourceWriter.WriteLine("RegisterProperty<{0}>( \"{1}\", &{2} );", prop.Parameter.Type, prop.CleanName, prop.Parameter.Name);
+
+				initializeSource = sourceWriter.ToString();
 			}
 
-			comp.GeneratedFunctions = new Function[] { serializeFunction, initializeFunction };
+			//---------- Static Type function
+			{
+				StringWriter sourceWriter = new StringWriter();
+				sourceWriter.WriteLine("static ComponentType STATIC_TYPE( \"{0}\", {1} );", comp.Name, comp.Id);
+				sourceWriter.WriteLine("return STATIC_TYPE;");
+
+				staticTypeSource = sourceWriter.ToString();
+			}
+
+			comp.GeneratedFunctions = new Function[] 
+			{
+				ConstructFunction("public", "void", "Serialize", "", "override", serializeSource, ConstructParameter("IArchive*", "archive")),
+				ConstructFunction("public", "void", "Initialize", "", "override", initializeSource),
+				ConstructFunction("public", "const ComponentType&", "StaticType", "static", "", staticTypeSource)
+			};
 		}
 
 		public static void ProcessDatabase(TypeDatabase database, CodeGenerationManifest manifest)

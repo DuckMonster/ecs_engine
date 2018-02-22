@@ -1,4 +1,5 @@
 #pragma once
+#include "Core/Meta/MetaData.h"
 
 _TYPE_DATABASE()
 class ComponentType
@@ -7,6 +8,7 @@ public:
 	typedef char id_t;
 	static const id_t INVALID_ID;
 
+	//--------------------------------------------------- Database
 public:
 	_DATABASE_INIT_FUNC()
 	static void InitializeTypes();
@@ -22,6 +24,7 @@ private:
 	template<class TComp>
 	static void RegisterType(const char* name, id_t id);
 
+	//--------------------------------------------------- Class
 public:
 	ComponentType() {}
 	ComponentType(const char* name, id_t id) : m_Name(name), m_Id(id) {}
@@ -32,7 +35,7 @@ public:
 	bool IsValid() const { return m_Id == INVALID_ID; }
 
 private:
-	const id_t m_Id = INVALID_ID;
+	id_t m_Id = INVALID_ID;
 	const char* m_Name = nullptr;
 };
 
@@ -43,6 +46,6 @@ void ComponentType::RegisterType(const char* name, id_t id)
 
 	ComponentType type(name, id);
 
-	s_StringTypeMap.emplace(name, ComponentType(name, id));
-	s_IdTypeMap.emplace(id, ComponentType(name, id));
+	s_StringTypeMap[name] = type;
+	s_IdTypeMap[id] = type;
 }

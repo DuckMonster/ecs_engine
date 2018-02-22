@@ -18,6 +18,8 @@ public:
 	template<class TComp>
 	TComp* GetComponent() const;
 
+	const std::vector<Component*>& GetAllComponents() const { return m_ComponentList; }
+
 private:
 	FName m_Name;
 	std::vector<Component*> m_ComponentList;

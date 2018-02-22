@@ -19,6 +19,7 @@ namespace CodeGenerator
 
 			WriteInclude("CorePCH.h");
 			WriteInclude(file.FullPath);
+			WriteInclude("Core/Serialize/Archive.h");
 		}
 
 		public void WriteInclude(string file)
@@ -37,11 +38,7 @@ namespace CodeGenerator
 				source = "";
 
 			source = IndentSource(source, 1);
-
-			if (className.Length > 0)
-				WriteLine(FUNC, func.Signature(className), source);
-			else
-				WriteLine(FUNC, func.Signature(), source);
+			WriteLine(FUNC, func.Implemenatation(className), source);
 		}
 
 		public void WriteDatabase(TypeDatabase db, CodeGenerationManifest manifest)
@@ -86,7 +83,7 @@ namespace CodeGenerator
 		const string DEFINE_CURR = "#ifdef CURRENT_FILE\r\n#undef CURRENT_FILE\r\n#endif\r\n#define CURRENT_FILE {0}\r\n\r\n";
 		const string DEFINE_GEN_HEADER = "#define GEN_BODY_{0}(...) \\\r\n{1}\r\n";
 		const string FUNC = "{0}\r\n{{\r\n\t// This is a generated function! Hello!\r\n{1}\r\n}}\r\n";
-		const string FUNC_DECL = "protected: {0};\r\n";
+		const string FUNC_DECL = "{0};\r\n";
 		SourceFile file;
 
 		string CURRENT_FILE;
@@ -97,7 +94,6 @@ namespace CodeGenerator
 			this.file = file;
 			CURRENT_FILE = file.StripExtension();
 
-			WriteInclude("Core/Serialize/Archive.h");
 			WriteLine(DEFINE_CURR, CURRENT_FILE);
 
 			CompleteSource = new StringWriter();
@@ -122,11 +118,7 @@ namespace CodeGenerator
 				source = "";
 
 			source = IndentSource(source, 1);
-
-			if (className.Length > 0)
-				CompleteSource.WriteLine(FUNC, func.Signature(className), source);
-			else
-				CompleteSource.WriteLine(FUNC, func.Signature(), source);
+			CompleteSource.WriteLine(FUNC, func.Signature(), source);
 		}
 
 		public void WriteFunctionDeclaration(Function func)

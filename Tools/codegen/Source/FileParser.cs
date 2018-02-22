@@ -8,11 +8,37 @@ namespace CodeGenerator
 {
 	struct FileParser
 	{
-		// ----------- STATIC FUNCTIONS
-		static Regex COMP_RGX = new Regex(@"\sCOMPONENT\(\s*([\w\s,]*?)\s*\)\n?\s*class (.+) : *(?:public )? *(.+)\n((\s*){(?:.*\n)*?\5})");
-		static Regex FUNC_RGX = new Regex(@"\sFUNCTION\s*\(\s*([\w\s,]*)\s*\)\W*(.+?)\s+(\w+)\s*\(\s*([\w\s,&*:]*)\s*\)");
-		static Regex PROP_RGX = new Regex(@"\sPROPERTY\s*\(\s*([\w\s,]*)\s*\)\W*(.*?);");
+		static SourceFile CurrentFile;
 
+		/* Component regex
+		 * Group 1: MetaData
+		 * Group 2: Component Name (class name)
+		 * Group 3: Parent Name
+		 * Group 4: Full body of component
+		 * Group 5: (group used for brace matching)
+		 */
+		static Regex COMP_RGX = new Regex(@"\sCOMPONENT\(\s*([\w\s,]*?)\s*\)\n?\s*class (.+) : *(?:public )? *(.+)\n((\s*){(?:.*\n)*?\5})");
+
+		/* Function regex
+		 * Group 1: MetaData
+		 * Group 2: Return Type
+		 * Group 3: Function Name
+		 * Group 4: Arguments
+		 */
+		static Regex FUNC_RGX = new Regex(@"\sFUNCTION\s*\(\s*([\w\s,]*)\s*\)\W*(.+?)\s+(\w+)\s*\(\s*([\w\s,&*:]*)\s*\)");
+
+		/* Property regex
+		 * Group 1: MetaData
+		 * Group 2: Type
+		 * Group 3: Name
+		 */
+		static Regex PROP_RGX = new Regex(@"\sPROPERTY\s*\(\s*([\w\s,]*)\s*\)\W*(.*)\s(.*?)\s[=;]");
+
+		/* Type database regex
+		 * Group 1: MetaData
+		 * Group 2: Class Name
+		 * Group 3: Full body of class
+		 */
 		static Regex TYPE_DB_RGX = new Regex(@"\s_TYPE_DATABASE\(\s*([\w\s,]*?)\s*\)\n?\s*class (.+).*\n((\s*){(?:.*\n)*?\4})");
 
 		public static void Parse(string sourcePath, CodeGenerationManifest manifest)
@@ -28,6 +54,8 @@ namespace CodeGenerator
 			file.FileName = Path.GetFileName(sourcePath);
 			file.FullPath = sourcePath;
 			file.Source = File.ReadAllText(sourcePath).Replace("\r", "");
+
+			CurrentFile = file;
 
 			Utils.PrintVerbal("\n-------------- Parsing \"{0}\" ------------------\n", file.FileName);
 
@@ -77,7 +105,10 @@ namespace CodeGenerator
 						string[] propMetaData = ParseMetadata(propMatch[p].Groups[1].Value);
 
 						Property prop = new Property();
-						prop.Parameter = ParseParameters(propMatch[p].Groups[2].Value)[0];
+						prop.Parameter.Type = propMatch[p].Groups[2].Value;
+						prop.Parameter.Name = propMatch[p].Groups[3].Value;
+						prop.CleanName = CleanPropertyName(prop.Parameter.Name);
+
 						prop.MetaData = propMetaData;
 
 						compProperties[p] = prop;
@@ -139,7 +170,7 @@ namespace CodeGenerator
 			{
 				string[] paramSplit = commaSplit[i].Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 				if (paramSplit.Length == 1)
-					CodeGen.Error("\"{0}\" is an invalid parameter!", src);
+					CodeGen.Error(CurrentFile.FileName, "\"{0}\" is an invalid parameter!", src);
 
 				for (int j = 0; j < paramSplit.Length; j++)
 					paramSplit[j] = paramSplit[j].Trim();
@@ -164,28 +195,12 @@ namespace CodeGenerator
 			return metadata;
 		}
 
-		public static void Generate(CodeGenerationManifest manifest, string path)
+		public static string CleanPropertyName(string name)
 		{
-			// Generate database
-			{
-				TypeDatabase db = manifest.Database;
-				string fullpath = path + db.File.GenSrcFileName();
-
-				if (!File.Exists(fullpath) && !CodeGen.GenData.CanGenerate)
-					CodeGen.Error("File \"{0}\" does not exists in update mode", fullpath);
-
-				FileStream stream = File.Open(fullpath, FileMode.Create);
-				SourceWriter writer = new SourceWriter(db.File, stream);
-
-
-				//foreach (Function func in file.Component.Functions)
-				//writer.WriteFunction(func);
-
-				writer.Flush();
-				stream.Close();
-
-				Utils.Print("Generated \"{0}\"...", fullpath);
-			}
+			if (name.StartsWith("m_"))
+				return name.Substring(2);
+			else
+				return name;
 		}
 	}
 }
