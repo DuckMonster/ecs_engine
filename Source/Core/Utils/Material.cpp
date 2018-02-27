@@ -5,7 +5,7 @@
 
 #ifndef GAME_HEADLESS
 #define UNIFORM_SET_CPP(type, func, valptr) \
-void CMaterial::Set(const char* uniform, const type* value, uint count) \
+void CMaterial::Set(const char* uniform, const type* value, uint32 count) \
 { \
 	glUseProgram(m_Program); \
 	GLuint handle = glGetUniformLocation(m_Program, uniform); \
@@ -17,7 +17,7 @@ void CMaterial::Set(const char* uniform, const type* value, uint count) \
 }
 
 #define UNIFORM_SET_MAT_CPP(type, func, valptr) \
-void CMaterial::Set(const char* uniform, const type* value, uint count) \
+void CMaterial::Set(const char* uniform, const type* value, uint32 count) \
 { \
 	glUseProgram(m_Program); \
 	GLuint handle = glGetUniformLocation(m_Program, uniform); \

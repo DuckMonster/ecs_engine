@@ -12,6 +12,7 @@ namespace CodeGenerator
 		public string FileName;
 		public string FullPath;
 		public string Source;
+		public DateTime ModifyTime;
 
 		public string StripExtension()
 		{
@@ -28,6 +29,16 @@ namespace CodeGenerator
 		{
 			string name = StripExtension();
 			return name + ".gen.h";
+		}
+
+		public string GenSourcePath()
+		{
+			return Path.Combine(CodeGen.GenData.TargetPath, GenSrcFileName());
+		}
+
+		public string GenHeaderPath()
+		{
+			return Path.Combine(CodeGen.GenData.TargetPath, GenHeaderFileName());
 		}
 	}
 

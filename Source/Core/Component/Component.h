@@ -3,7 +3,7 @@
 #include "Core/Utils/StringUtils.h"
 
 class Entity;
-class IArchive;
+class NamedArchive;
 
 class Component
 {
@@ -72,10 +72,9 @@ public:
 	}
 
 	void DebugPrint();
+	virtual void Serialize(NamedArchive& archive);
 
 protected:
-	virtual void Serialize(IArchive* archive);
-
 	template<class T>
 	void RegisterProperty(const char* name, const void* prop);
 

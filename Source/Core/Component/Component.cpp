@@ -61,6 +61,6 @@ void Component::Initialize()
 {
 }
 
-void Component::Serialize(IArchive* archive)
+void Component::Serialize(NamedArchive& archive)
 {
 }

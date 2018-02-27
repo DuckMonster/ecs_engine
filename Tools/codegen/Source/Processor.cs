@@ -36,7 +36,7 @@ namespace CodeGenerator
 				staticTypeSource = "";
 
 			{
-				const string SERIALIZE_FORMAT = "archive->Serialize<{0}>(\"{1}\", &{2});";
+				const string SERIALIZE_FORMAT = "archive.Serialize<{0}>(\"{1}\", {2});";
 				StringWriter sourceWriter = new StringWriter();
 
 				sourceWriter.WriteLine("{0}::Serialize( archive );", comp.Parent);
@@ -75,7 +75,7 @@ namespace CodeGenerator
 
 			comp.GeneratedFunctions = new Function[] 
 			{
-				ConstructFunction("public", "void", "Serialize", "", "override", serializeSource, ConstructParameter("IArchive*", "archive")),
+				ConstructFunction("public", "void", "Serialize", "", "override", serializeSource, ConstructParameter("NamedArchive&", "archive")),
 				ConstructFunction("public", "void", "Initialize", "", "override", initializeSource),
 				ConstructFunction("public", "const ComponentType&", "StaticType", "static", "", staticTypeSource)
 			};

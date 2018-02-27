@@ -18,6 +18,6 @@ public:
 	RenderFlag m_Flags;
 	GLenum m_DrawMode;
 
-	uint m_DrawCount;
+	uint32 m_DrawCount;
 	bool m_UsingElements;
 };

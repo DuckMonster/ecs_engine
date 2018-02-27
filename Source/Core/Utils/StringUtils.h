@@ -7,8 +7,8 @@ namespace StringUtils
 {
 	inline void Tokenize( const std::string& inString, const char token, std::vector<std::string>& outVector, const bool ignoreEmpty = false )
 	{
-		uint p = 0;
-		for ( uint i = 0; i <= inString.size(); ++i )
+		uint32 p = 0;
+		for ( uint32 i = 0; i <= inString.size(); ++i )
 		{
 			if ( inString[i] == token || i == inString.size() )
 			{

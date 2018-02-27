@@ -65,6 +65,8 @@ namespace CodeGenerator
 
 			manifest.Print();
 
+			Utils.PrintVerbal("\n- Generating...");
+
 			// Process
 			foreach(Component comp in manifest.Components)
 			{

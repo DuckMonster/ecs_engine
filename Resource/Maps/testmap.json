@@ -1,0 +1,39 @@
+{
+	"name": "My Testmap",
+	"entities":
+	[
+		{
+			"name": "PlayerEntity",
+			"components":
+			[
+				{
+					"type": "TransformComponent",
+					"Position": [5.0, 0.0, 0.0],
+					"Scale": [0.2, 0.2, 0.2]
+				},
+				{
+					"type": "RenderableComponent"
+				}
+			]
+		},
+		{
+			"name": "EnemyEntity",
+			"components":
+			[
+				{
+					"type": "TransformComponent",
+					"Rotation": [0.0, 90.0, 0.0]
+				},
+				{
+					"type": "CameraComponent",
+					"HerpValue": 500.0055,
+					"IntValue": 1337,
+					"StringValue": "Hello from JSON <3"
+				},
+				{
+					"type": "RenderableComponent"
+				}
+			]
+		}
+	]
+}

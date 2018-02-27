@@ -54,6 +54,21 @@ namespace CodeGenerator
 			file.FileName = Path.GetFileName(sourcePath);
 			file.FullPath = sourcePath;
 			file.Source = File.ReadAllText(sourcePath).Replace("\r", "");
+			file.ModifyTime = File.GetLastWriteTime(sourcePath);
+
+			// Check if the source file has not been modified since last generation
+			//if (!CodeGen.GenData.CanGenerate && File.Exists(file.GenSourcePath()) && File.Exists(file.GenHeaderPath()))
+			//{
+			//	DateTime SourceDate = File.GetLastWriteTime(sourcePath),
+			//		TargetSourceDate = File.GetLastWriteTime(file.GenSourcePath()),
+			//		TargetHeaderDate = File.GetLastWriteTime(file.GenHeaderPath());
+
+			//	if (SourceDate < TargetSourceDate && SourceDate < TargetHeaderDate)
+			//	{
+			//		Utils.Print("Skipping \"{0}\"...", file.FileName);
+			//		return;
+			//	}
+			//}
 
 			CurrentFile = file;
 

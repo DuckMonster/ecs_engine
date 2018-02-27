@@ -2,8 +2,8 @@
 
 class FName
 {
-	static uint s_LastId;
-	static std::map<std::string, uint> s_NameMap;
+	static uint32 s_LastId;
+	static std::map<std::string, uint32> s_NameMap;
 
 public:
 	FName();
@@ -25,6 +25,6 @@ public:
 	const char* c_str() const { return m_String.c_str(); }
 
 private:
-	uint m_Id = 0;
+	uint32 m_Id = 0;
 	std::string m_String = "";
 };

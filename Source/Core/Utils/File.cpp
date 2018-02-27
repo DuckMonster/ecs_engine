@@ -19,7 +19,7 @@ bool File::ReadFile( const char* filePath, string& outString )
 	fileStream.read( buffer, sizeof( buffer ) );
 
 	// Add null-terminator
-	buffer[(uint)fileStream.gcount( )] = '\0';
+	buffer[(uint32)fileStream.gcount( )] = '\0';
 
 	outString = buffer;
 	return true;
@@ -30,7 +30,7 @@ bool File::ReadFile( const char* filePath, string& outString )
 string File::GetFileFromPath( const string& fullPath )
 {
 	int lastSlash = -1;
-	for (uint i=0; i < fullPath.length( ); i++)
+	for (uint32 i=0; i < fullPath.length( ); i++)
 	{
 		if (fullPath[i] == '\\' || fullPath[i] == '/')
 			lastSlash = i;

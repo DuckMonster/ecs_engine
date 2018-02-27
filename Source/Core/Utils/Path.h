@@ -21,13 +21,13 @@ public:
 	FPath& operator +=( const FPath& other );
 	FPath& operator += ( const FName& name );
 
-	const FName operator[]( uint index ) const { return GetName( index ); }
+	const FName operator[]( uint32 index ) const { return GetName( index ); }
 
 	size_t Length() const { return m_PathNames.size(); }
 	void Clear() { m_PathNames.clear(); }
 
 	std::string ToURI() const;
-	const FName GetName( uint index ) const;
+	const FName GetName( uint32 index ) const;
 
 private:
 	void FromURI( const std::string& str );

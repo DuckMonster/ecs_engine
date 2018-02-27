@@ -28,7 +28,7 @@ FName FPath::PopName( )
 *******************************************************************************/
 bool FPath::Contains( const FName& name ) const
 {
-	for ( uint i = 0; i < m_PathNames.size(); i++ )
+	for ( uint32 i = 0; i < m_PathNames.size(); i++ )
 	{
 		if ( m_PathNames[i] == name )
 			return true;
@@ -44,7 +44,7 @@ bool FPath::operator==( const FPath & other ) const
 	if ( m_PathNames.size() != other.m_PathNames.size() )
 		return false;
 
-	for ( uint i = 0; i < m_PathNames.size(); i++ )
+	for ( uint32 i = 0; i < m_PathNames.size(); i++ )
 	{
 		if ( m_PathNames[i] != other.m_PathNames[i] )
 			return false;
@@ -94,7 +94,7 @@ string FPath::ToURI() const
 
 	string result;
 
-	for ( uint i = 0; i < m_PathNames.size(); i++ )
+	for ( uint32 i = 0; i < m_PathNames.size(); i++ )
 	{
 		result += "/" + m_PathNames[i].str();
 	}
@@ -104,7 +104,7 @@ string FPath::ToURI() const
 
 /**	Get Name
 *******************************************************************************/
-const FName FPath::GetName( uint index ) const
+const FName FPath::GetName( uint32 index ) const
 {
 	if ( !Ensure( index < m_PathNames.size() ) )
 		return FName();

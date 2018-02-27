@@ -23,7 +23,7 @@ bool GLUtils::ReadFile( const char* filePath, string& outString )
 	fileStream.read( buffer, sizeof( buffer ) );
 
 	// Add null-terminator
-	buffer[(uint)fileStream.gcount( )] = '\0';
+	buffer[(uint32)fileStream.gcount( )] = '\0';
 
 	outString = buffer;
 	return true;

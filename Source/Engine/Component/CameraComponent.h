@@ -10,11 +10,11 @@ class CameraComponent : public Component
 public:
 	CameraComponent(Entity* entity) : Component(entity), m_ProjectionMatrix(1.f) {}
 
-	PROPERTY()
+	PROPERTY(Serialize)
 	float m_HerpValue = 5.f;
-	PROPERTY()
+	PROPERTY(Serialize)
 	int m_IntValue = 200;
-	PROPERTY()
+	PROPERTY(Serialize)
 	std::string m_StringValue = "Hej hej! :)";
 
 	glm::mat4 m_ProjectionMatrix;

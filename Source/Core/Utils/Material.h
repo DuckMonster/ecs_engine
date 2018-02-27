@@ -1,6 +1,6 @@
 #pragma once
 #define UNIFORM_SET_H(type) void Set(const char* uniform, const type& value) { Set( uniform, &value, 1 ); }\
-void Set( const char* uniform, const type* ptr, const uint count )
+void Set( const char* uniform, const type* ptr, const uint32 count )
 
 enum class MaterialRenderMode
 {

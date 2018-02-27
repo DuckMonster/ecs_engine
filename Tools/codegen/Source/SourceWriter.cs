@@ -19,7 +19,7 @@ namespace CodeGenerator
 
 			WriteInclude("CorePCH.h");
 			WriteInclude(file.FullPath);
-			WriteInclude("Core/Serialize/Archive.h");
+			WriteInclude("Core/Serialize/NamedArchive.h");
 		}
 
 		public void WriteInclude(string file)

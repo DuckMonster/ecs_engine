@@ -3,8 +3,8 @@
 
 using namespace std;
 
-uint FName::s_LastId = 1;
-map<std::string, uint> FName::s_NameMap;
+uint32 FName::s_LastId = 1;
+map<std::string, uint32> FName::s_NameMap;
 
 /**	Constructor
 *******************************************************************************/
@@ -29,7 +29,7 @@ FName::FName( const FName& other ) : m_Id( other.m_Id ), m_String( other.m_Strin
 *******************************************************************************/
 FName& FName::operator=( const string& str )
 {
-	map<string, uint>::iterator it = s_NameMap.find( str );
+	map<string, uint32>::iterator it = s_NameMap.find( str );
 	if ( it == s_NameMap.end() )
 	{
 		m_Id = s_LastId++;
