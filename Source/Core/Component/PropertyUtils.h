@@ -2,6 +2,7 @@
 
 class Resource;
 class MeshResource;
+class ScriptResource;
 
 namespace propertyutils
 {
@@ -11,6 +12,7 @@ namespace propertyutils
 	std::stringstream& operator <<(std::stringstream& stream, glm::quat& data);
 	std::stringstream& operator <<(std::stringstream& stream, Resource*& data);
 	inline std::stringstream& operator <<(std::stringstream& stream, MeshResource*& data) { return operator<<(stream, (Resource*&)data); }
+	inline std::stringstream& operator <<(std::stringstream& stream, ScriptResource*& data) { return operator<<(stream, (Resource*&)data); }
 
 	template<typename T>
 	std::string TypeToString(T& data)

@@ -4,9 +4,10 @@
 class MeshResource : public Resource
 {
 public:
-	MeshResource(ResourceManager* manager, Hash::Type hash) : Resource(manager, hash) {}
+	MeshResource(ResourceManager* manager, guid_t hash) : Resource(manager, hash) {}
 
 	bool Load(const char* path) override;
+	void Release() override;
 
 	GLuint GetVAO() const { return m_VAO; }
 	uint32 GetDrawCount() const { return m_DrawCount; }
@@ -21,17 +22,8 @@ private:
 };
 
 #include "Core/Serialize/NamedArchive.h"
-#include "ResourceManager.h"
 
 /**	Mesh Resource Archive Serialization
 *******************************************************************************/
 template<>
-inline bool NamedArchive::Serialize<MeshResource*>(const char* name, MeshResource*& value)
-{
-	const char* resourceName = nullptr;
-	if (!Serialize(name, resourceName))
-		return false;
-
-	value = ResourceManager::GetInstance()->LoadMesh(resourceName);
-	return true;
-}
+bool NamedArchive::Serialize<MeshResource*>(const char* name, MeshResource*& value);

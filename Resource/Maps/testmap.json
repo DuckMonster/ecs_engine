@@ -1,6 +1,6 @@
 {
 	"name": "My Testmap",
-	"camera": "Camera2",
+	"camera": "Camera",
 
 	"entities":
 	[
@@ -64,28 +64,10 @@
 					"type": "CameraComponent",
 					"Far": 10.0,
 					"Near": 2.0,
-					"Perspective": false
-				}
-			]
-		},
-		{
-			"name": "Camera2",
-			"components":
-			[
-				{
-					"type": "TransformComponent",
-					"Position": [0.0, 5.0, 5.0]
-				},
-				{
-					"type": "CameraComponent",
-					"Far": 10.0,
-					"Near": 2.0,
-					"Perspective": true,
-					"FieldOfView": 40.0
+					"Perspective": false,
+					"Script": "Resource/Script/testscript.as"
 				}
 			]
 		}
-	],
-
-	"IsWow": true
+	]
 }

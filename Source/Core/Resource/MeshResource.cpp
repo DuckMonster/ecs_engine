@@ -1,6 +1,8 @@
 #include "CorePCH.h"
 #include "MeshResource.h"
 
+/**	Load
+*******************************************************************************/
 bool MeshResource::Load(const char* path)
 {
 	float data[] {
@@ -31,4 +33,26 @@ bool MeshResource::Load(const char* path)
 	m_Elements = false;
 
 	return Resource::Load(path);
+}
+
+/**	Release
+*******************************************************************************/
+void MeshResource::Release()
+{
+	glDeleteVertexArrays(1, &m_VAO);
+}
+
+#include "ResourceManager.h"
+
+/**	Serialize Specialization
+*******************************************************************************/
+template<>
+bool NamedArchive::Serialize<MeshResource*>(const char* name, MeshResource*& value)
+{
+	const char* resourceName = nullptr;
+	if (!Serialize(name, resourceName))
+		return false;
+
+	value = ResourceManager::GetInstance()->LoadMesh(resourceName);
+	return true;
 }

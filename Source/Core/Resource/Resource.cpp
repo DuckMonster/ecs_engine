@@ -25,6 +25,13 @@ bool Resource::Load(const char* path)
 	return true;
 }
 
+/**	Release
+*******************************************************************************/
+void Resource::Release()
+{
+
+}
+
 /**	Get Modified Time
 *******************************************************************************/
 time_t Resource::GetModifiedTime() const

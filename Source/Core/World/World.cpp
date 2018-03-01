@@ -37,8 +37,8 @@ void World::DoFrame(float delta)
 	if ((FRAME_TIMER += delta) > 1.f)
 	{
 		FRAME_TIMER = 0.f;
-		Debug_Log("Hello World, MS = %f", delta);
-		PrintWorld();
+		//Debug_Log("Hello World, MS = %f", delta);
+		//PrintWorld();
 	}
 
 #if DEBUG

@@ -48,6 +48,8 @@ project "Game"
 	prebuildcommands {
 		"\"%{wks.location}..\\Bin\\CodeGen\\CodeGen.exe\" \"%{wks.location}..\\Source\" \"%{wks.location}gen\""
 	}
+	
+	links { "angelscript64" }
  	
 	filter "Release or ReleaseServer"
 		defines { "NDEBUG" }
@@ -71,6 +73,7 @@ project "Game"
 
 	filter "DebugServer or ReleaseServer"
 		defines { "GAME_HEADLESS" }
+
 
 group "Tools"
 	project "CodeGen"

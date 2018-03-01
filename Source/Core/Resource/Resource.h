@@ -5,14 +5,18 @@ class ResourceManager;
 class Resource
 {
 public:
-	Resource(ResourceManager* manager, Hash::Type hash);
+	typedef Hash::Type guid_t;
+
+public:
+	Resource(ResourceManager* manager, guid_t hash);
 	virtual ~Resource();
 
 	virtual bool Load(const char* path);
+	virtual void Release();
 
 	const ResourceManager* GetManager() const { return m_Manager; }
 	const char* GetPath() const { return m_Path.c_str(); }
-	const Hash::Type& GetHash() const { return m_Hash; }
+	const guid_t& GetHash() const { return m_Hash; }
 
 	time_t GetModifiedTime() const;
 	bool HasChanged();
@@ -22,7 +26,7 @@ public:
 private:
 	ResourceManager* const m_Manager;
 	std::string m_Path;
-	const Hash::Type m_Hash;
+	const guid_t m_Hash;
 
 	time_t m_ModifiedTime;
 };

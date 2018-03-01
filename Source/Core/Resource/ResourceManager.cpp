@@ -2,6 +2,7 @@
 #include "ResourceManager.h"
 
 #include "MeshResource.h"
+#include "ScriptResource.h"
 #include "Core/Utils/File.h"
 
 
@@ -15,6 +16,11 @@ Resource* ResourceManager::Load(const char* path)
 MeshResource* ResourceManager::LoadMesh(const char* path)
 {
 	return GetOrCreateResource<MeshResource>(path);
+}
+
+ScriptResource* ResourceManager::LoadScript(const char* path)
+{
+	return GetOrCreateResource<ScriptResource>(path);
 }
 
 /**	Release
