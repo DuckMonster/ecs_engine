@@ -28,17 +28,8 @@ private:
 };
 
 #include "Core/Serialize/NamedArchive.h"
-#include "ResourceManager.h"
 
 /**	Resource Archive Serialization
 *******************************************************************************/
 template<>
-inline bool NamedArchive::Serialize<Resource*>(const char* name, Resource*& value)
-{
-	const char* resourceName = nullptr;
-	if (!Serialize(name, resourceName))
-		return false;
-
-	value = ResourceManager::GetInstance()->Load(name);
-	return true;
-}
+bool NamedArchive::Serialize<Resource*>(const char* name, Resource*& value);

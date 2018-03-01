@@ -1,5 +1,7 @@
 {
 	"name": "My Testmap",
+	"camera": "Camera2",
+
 	"entities":
 	[
 		{
@@ -7,7 +9,10 @@
 			"components":
 			[
 				{
-					"type": "TransformComponent"
+					"type": "TransformComponent",
+					"Position": [0.5, 0.0, 0.0],
+					"Rotation": [0.0, 0.0, 0.0],
+					"Scale": [1.0, 1.0, 1.0]
 				},
 				{
 					"type": "RenderableComponent",
@@ -21,8 +26,9 @@
 			[
 				{
 					"type": "TransformComponent",
-					"Position": [2.0, 0.0, 0.0],
-					"Rotation": [0.0, 90.0, 0.0]
+					"Position": [-0.5, 0.0, 0.0],
+					"Rotation": [0.0, 0.0, 0.0],
+					"Scale": [1.0, 1.0, 1.0]
 				},
 				{
 					"type": "RenderableComponent",
@@ -31,23 +37,55 @@
 			]
 		},
 		{
-			"name": "EnemyEntity",
+			"name": "ThirdEntity",
 			"components":
 			[
 				{
 					"type": "TransformComponent",
-					"Rotation": [0.0, 90.0, 0.0]
+					"Position": [0.0, 1.0, 0.0],
+					"Rotation": [0.0, 0.0, 0.0],
+					"Scale": [1.0, 1.0, 1.0]
+				},
+				{
+					"type": "RenderableComponent",
+					"Mesh": "Resource/Mesh/triangle.fbx"
+				}
+			]
+		},
+		{
+			"name": "Camera",
+			"components":
+			[
+				{
+					"type": "TransformComponent",
+					"Position": [0.0, 5.0, 5.0]
 				},
 				{
 					"type": "CameraComponent",
-					"HerpValue": 500.0055,
-					"IntValue": 1337,
-					"StringValue": "Hello from JSON <3"
+					"Far": 10.0,
+					"Near": 2.0,
+					"Perspective": false
+				}
+			]
+		},
+		{
+			"name": "Camera2",
+			"components":
+			[
+				{
+					"type": "TransformComponent",
+					"Position": [0.0, 5.0, 5.0]
 				},
 				{
-					"type": "RenderableComponent"
+					"type": "CameraComponent",
+					"Far": 10.0,
+					"Near": 2.0,
+					"Perspective": true,
+					"FieldOfView": 40.0
 				}
 			]
 		}
-	]
+	],
+
+	"IsWow": true
 }

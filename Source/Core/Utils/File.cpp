@@ -9,7 +9,7 @@ using namespace std;
 *******************************************************************************/
 bool File::ReadFile(const char* filePath, string& outString)
 {
-	static char buffer[1024];
+	static char buffer[10000];
 
 	// Open file
 	ifstream fileStream(filePath, ifstream::binary);

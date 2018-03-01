@@ -38,4 +38,18 @@ private:
 	rapidjson::Pointer m_Pointer;
 };
 
+// Some default serialize specializations
+//--------------------------------------------------- 
+template<>
+bool NamedArchive::Serialize<std::string>(const char* name, std::string& value);
+template<>
+bool NamedArchive::Serialize<glm::vec2>(const char* name, glm::vec2& value);
+template<>
+bool NamedArchive::Serialize<glm::vec3>(const char* name, glm::vec3& value);
+template<>
+bool NamedArchive::Serialize<glm::vec4>(const char* name, glm::vec4& value);
+template<>
+bool NamedArchive::Serialize<glm::quat>(const char* name, glm::quat& value);
+//--------------------------------------------------- 
+
 #include "NamedArchive.inl"

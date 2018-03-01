@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace CodeGenerator
@@ -32,7 +33,9 @@ namespace CodeGenerator
 		{
 			string serializeSource = "",
 				initializeSource = "",
-				staticTypeSource = ""; 
+				staticTypeSource = "";
+
+			List<Function> generatedFunctions = new List<Function>();
 
 			//---------- Serialize Function
 			if (!comp.HasUserSerialize)
@@ -51,6 +54,7 @@ namespace CodeGenerator
 				}
 
 				serializeSource = sourceWriter.ToString();
+				generatedFunctions.Add(ConstructFunction("public", "void", "Serialize", "", "override", serializeSource, ConstructParameter("NamedArchive&", "archive")));
 			}
 
 			//---------- Initialize function
@@ -63,6 +67,7 @@ namespace CodeGenerator
 					sourceWriter.WriteLine("RegisterProperty<{0}>( \"{1}\", &{2} );", prop.Parameter.Type, prop.CleanName, prop.Parameter.Name);
 
 				initializeSource = sourceWriter.ToString();
+				generatedFunctions.Add(ConstructFunction("public", "void", "Initialize", "", "override", initializeSource));
 			}
 
 			//---------- Static Type function
@@ -72,14 +77,10 @@ namespace CodeGenerator
 				sourceWriter.WriteLine("return STATIC_TYPE;");
 
 				staticTypeSource = sourceWriter.ToString();
+				generatedFunctions.Add(ConstructFunction("public", "const ComponentType&", "StaticType", "static", "", staticTypeSource));
 			}
 
-			comp.GeneratedFunctions = new Function[] 
-			{
-				ConstructFunction("public", "void", "Serialize", "", "override", serializeSource, ConstructParameter("NamedArchive&", "archive")),
-				ConstructFunction("public", "void", "Initialize", "", "override", initializeSource),
-				ConstructFunction("public", "const ComponentType&", "StaticType", "static", "", staticTypeSource)
-			};
+			comp.GeneratedFunctions = generatedFunctions.ToArray();
 		}
 
 		public static void ProcessDatabase(TypeDatabase database, CodeGenerationManifest manifest)

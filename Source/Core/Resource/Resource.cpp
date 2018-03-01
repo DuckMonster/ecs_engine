@@ -62,3 +62,17 @@ bool Resource::Equals(const Resource* other) const
 
 	return isEquals;
 }
+
+#include "ResourceManager.h"
+/**	Serialize Specialization
+*******************************************************************************/
+template<>
+bool NamedArchive::Serialize<Resource*>(const char* name, Resource*& value)
+{
+	const char* resourceName = nullptr;
+	if (!Serialize(name, resourceName))
+		return false;
+
+	value = ResourceManager::GetInstance()->Load(name);
+	return true;
+}

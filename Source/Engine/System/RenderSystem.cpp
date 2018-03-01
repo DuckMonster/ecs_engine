@@ -17,9 +17,11 @@ void RenderSystem::RunBegin()
 		}
 	}
 
+	glEnable(GL_DEPTH_TEST);
+
 	// Clear screen
-	glClearColor( 0.1f, 0.1f, 0.1f, 1.f );
-	glClear( GL_COLOR_BUFFER_BIT );
+	glClearColor(0.1f, 0.1f, 0.1f, 1.f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void RenderSystem::RunInternal(Entity* entity, const TransformComponent* transform, const RenderableComponent* renderable)

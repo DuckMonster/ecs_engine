@@ -50,3 +50,45 @@ uint32 NamedArchive::ArraySize()
 
 	return value->Size();
 }
+
+//--------------------------------------------------- Specializations!
+template<>
+bool NamedArchive::Serialize<std::string>(const char* name, std::string& value)
+{
+	const char* charValue = nullptr;
+	if (!Serialize(name, charValue))
+		return false;
+
+	value = charValue;
+	return true;
+}
+
+template<>
+bool NamedArchive::Serialize<glm::vec2>(const char* name, glm::vec2& value)
+{
+	return SerializeArray<float>(name, (float*)&value, 2);
+}
+
+template<>
+bool NamedArchive::Serialize<glm::vec3>(const char* name, glm::vec3& value)
+{
+	return SerializeArray<float>(name, (float*)&value, 3);
+}
+
+template<>
+bool NamedArchive::Serialize<glm::vec4>(const char* name, glm::vec4& value)
+{
+	return SerializeArray<float>(name, (float*)&value, 4);
+}
+
+template<>
+bool NamedArchive::Serialize<glm::quat>(const char* name, glm::quat& value)
+{
+	// We don't want to write quaternions in text, so we do euler-angles instead
+	glm::vec3 eulerAngles;
+	if (!SerializeArray(name, (float*)&eulerAngles, 3))
+		return false;
+
+	value = Math::EulerToQuat(eulerAngles);
+	return true;
+}

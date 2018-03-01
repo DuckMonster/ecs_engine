@@ -11,13 +11,17 @@ public:
 	CameraComponent(Entity* entity) : Component(entity), m_ProjectionMatrix(1.f) {}
 
 	PROPERTY(Serialize)
-	float m_HerpValue = 5.f;
+	float m_Far = 1.f;
 	PROPERTY(Serialize)
-	int m_IntValue = 200;
+	float m_Near = 0.f;
 	PROPERTY(Serialize)
-	std::string m_StringValue = "Hej hej! :)";
+	bool m_Perspective = false;
+	PROPERTY(Serialize)
+	float m_OrthoHeight = 5.f;
+	PROPERTY(Serialize)
+	float m_FieldOfView = 45.f;
 
-	glm::mat4 m_ProjectionMatrix;
 	glm::mat4 m_ViewMatrix;
 	glm::mat4 m_CameraMatrix;
+	glm::mat4 m_ProjectionMatrix;
 };

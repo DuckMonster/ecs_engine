@@ -25,7 +25,7 @@ void CameraSystem::RunInternal(Entity* entity, TransformComponent* transform, Ca
 		sin(FTime::TotalElapsed()), 
 		1.f,
 		cos(FTime::TotalElapsed())
-	));
+	) * 5.f);
 	transform->LookAt(vec3());
 
 	{
@@ -35,25 +35,38 @@ void CameraSystem::RunInternal(Entity* entity, TransformComponent* transform, Ca
 
 		// In this engine, X-axis is forward and Z-axis is right
 		// So we have to swap X and Z, and also inverse Z to correspond to NDC
-		vec3 f(-result[0]),
+		vec3 f(result[0]),
 			u(result[1]),
 			r(result[2]);
 
 		// Eye offset
 		vec3 pos = transform->GetPosition();
 		result = mat4(
-			r.x, u.x, f.x, 0.f,
-			r.y, u.y, f.y, 0.f,
-			r.z, u.z, f.z, 0.f,
+			r.x, u.x, -f.x, 0.f,
+			r.y, u.y, -f.y, 0.f,
+			r.z, u.z, -f.z, 0.f,
 			-dot(pos, r), -dot(pos, u), dot(pos, f), 1.f
 		);
+
+		//result = glm::lookAt(pos, vec3(), vec3(0.f, 1.f, 0.f));
 
 		// Done!
 		camera->m_ViewMatrix = result;
 	}
 
-	float ratio = (float)Context::GetInstance()->width / (float)Context::GetInstance()->height;
-	camera->m_ProjectionMatrix = glm::ortho(-ratio * 5.f, ratio * 5.f, -5.f, 5.f, -10.f, 10.f);
+	{
+		float ratio = (float)Context::GetInstance()->width / (float)Context::GetInstance()->height;
+
+		if (camera->m_Perspective)
+		{
+			camera->m_ProjectionMatrix = glm::perspective(radians(camera->m_FieldOfView), ratio, camera->m_Near, camera->m_Far);
+		}
+		else
+		{
+			float height = camera->m_OrthoHeight;
+			camera->m_ProjectionMatrix = glm::ortho(-ratio * height, ratio * height, -height, height, camera->m_Near, camera->m_Far);
+		}
+	}
 
 	camera->m_CameraMatrix = camera->m_ProjectionMatrix * camera->m_ViewMatrix;
 }
