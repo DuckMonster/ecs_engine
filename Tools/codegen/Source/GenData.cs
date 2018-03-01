@@ -107,6 +107,7 @@ namespace CodeGenerator
 		public Function[] GeneratedFunctions;
 		public Property[] Properties;
 		public int Id;
+		public bool HasUserSerialize;
 
 		public bool HasFunction(string funcName)
 		{

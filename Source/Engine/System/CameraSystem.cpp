@@ -2,6 +2,7 @@
 #include "CameraSystem.h"
 #include "Core/World/World.h"
 #include "Core/Utils/Time.h"
+#include "Core/Context/Context.h"
 #include <glm/gtc/matrix_access.hpp>
 
 using namespace glm;
@@ -50,6 +51,9 @@ void CameraSystem::RunInternal(Entity* entity, TransformComponent* transform, Ca
 		// Done!
 		camera->m_ViewMatrix = result;
 	}
+
+	float ratio = (float)Context::GetInstance()->width / (float)Context::GetInstance()->height;
+	camera->m_ProjectionMatrix = glm::ortho(-ratio * 5.f, ratio * 5.f, -5.f, 5.f, -10.f, 10.f);
 
 	camera->m_CameraMatrix = camera->m_ProjectionMatrix * camera->m_ViewMatrix;
 }

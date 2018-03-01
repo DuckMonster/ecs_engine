@@ -5,6 +5,10 @@
 #include "Core/System/System.h"
 #include "Core/Context/Context.h"
 #include "Core/Serialize/NamedArchive.h"
+#include "Core/Resource/Resource.h"
+#include "Core/Resource/ResourceManager.h"
+
+// FOR TESTING, REMOVE LATER
 #include "Engine/Engine.h"
 
 using namespace glm;
@@ -41,10 +45,6 @@ Entity* CreateTestMesh(World* world, FName name)
 		GLuint shader = GLUtils::CreateShaderFromFile("Resource/Shader/test");
 
 		renderComp->m_ShaderProgram = shader;
-		renderComp->m_VertexObject = vao;
-		renderComp->m_DrawCount = 3;
-		renderComp->m_DrawMode = GL_TRIANGLES;
-		renderComp->m_UsingElements = false;
 	}
 
 	return entity;
@@ -96,7 +96,6 @@ World::World()
 	m_SystemList.push_back(new CameraSystem(this));
 	m_SystemList.push_back(new RenderSystem(this));
 
-	LoadMap("Resource/Maps/testmap.json");
 	PrintWorld();
 }
 
@@ -118,16 +117,31 @@ void World::DoFrame(float delta)
 	{
 		FRAME_TIMER = 0.f;
 		Debug_Log("Hello World, MS = %f", delta);
-
-		//PrintWorld();
+		PrintWorld();
 	}
+
+#if DEBUG
+	static float UPDATE_TIMER = 0.f;
+
+	if ((UPDATE_TIMER += delta) > 0.5f)
+	{
+		if (m_MapResource->HasChanged())
+			LoadFromResource();
+
+		UPDATE_TIMER = 0.f;
+	}
+#endif
 
 	RunSystems();
 }
 
+/**	Create Entity
+*******************************************************************************/
 Entity* World::CreateEntity(FName& name)
 {
 	entity_id id = m_LastEntityId++;
+
+	// Id overflow
 	Ensure(id != MAX_ENTITY);
 
 #if DEBUG
@@ -138,14 +152,33 @@ Entity* World::CreateEntity(FName& name)
 	m_EntityList.push_back(newEntity);
 	m_EntityLookup[id] = newEntity;
 
+	Debug_Log("Entity [%d] created: \"%s\"", id, name.c_str());
+
 	return newEntity;
 }
 
+/**	Get Entity
+*******************************************************************************/
 Entity* World::GetEntity(entity_id id)
 {
 	return m_EntityLookup[id];
 }
 
+/**	Find Entity
+*******************************************************************************/
+Entity* World::FindEntity(const FName& name)
+{
+	for (Entity* entity : m_EntityList)
+	{
+		if (entity->GetName() == name)
+			return entity;
+	}
+
+	return nullptr;
+}
+
+/**	Destroy Entity
+*******************************************************************************/
 void World::DestroyEntity(Entity* entity) { DestroyEntity(entity->GetId()); }
 void World::DestroyEntity(entity_id id)
 {
@@ -159,6 +192,17 @@ void World::DestroyEntity(entity_id id)
 	std::vector<Entity*>::iterator it = std::find(m_EntityList.begin(), m_EntityList.end(), entity);
 	if (Ensure(it != m_EntityList.end()))
 		m_EntityList.erase(it);
+}
+
+/**	Load Map
+*******************************************************************************/
+void World::LoadMap(const char* path)
+{
+	if (!Ensure(m_MapResource == nullptr))
+		return;
+
+	m_MapResource = ResourceManager::GetInstance()->Load(path);
+	LoadFromResource();
 }
 
 /**	Print World
@@ -179,6 +223,8 @@ void World::PrintWorld()
 	Debug_Log("--- WORLD END");
 }
 
+/**	Run Systems
+*******************************************************************************/
 void World::RunSystems()
 {
 	for (ISystem* system : m_SystemList)
@@ -187,13 +233,21 @@ void World::RunSystems()
 	}
 }
 
-void World::LoadMap(const char* path)
+/**	Load Map
+*******************************************************************************/
+void World::LoadFromResource()
 {
-	NamedArchive::Source source = NamedArchive::Open(path);
+	if (m_MapResource == nullptr)
+		return;
+
+	NamedArchive::Source source = NamedArchive::Open(m_MapResource->GetPath());
 	NamedArchive archive(source);
 
-	const char* mapName;
+	const char* mapName = nullptr;
 	archive.Serialize("name", mapName);
+
+	if (!Ensure(mapName))
+		return;
 
 	Debug_Log("Loading map \"%s\"...", mapName);
 
@@ -210,7 +264,11 @@ void World::LoadMap(const char* path)
 			if (!Ensure(entityArchive.Serialize("name", entityName)))
 				continue;
 
-			Entity* entity = CreateEntity(FName(entityName));
+			// Try to find and modify, otherwise it's a new entity!
+			Entity* entity = FindEntity(FName(entityName));
+
+			if (!entity)
+				entity = CreateEntity(FName(entityName));
 
 			// Read components
 			NamedArchive componentListArchive = entityArchive.Push("components");
@@ -229,9 +287,16 @@ void World::LoadMap(const char* path)
 				if (!Ensure(type.IsValid()))
 					continue;
 
-				Component* comp = entity->AddComponent(type);
+				// Find or create this component
+				Component* comp = entity->GetComponent(type);
+
+				if (!comp)
+					comp = entity->AddComponent(type);
+
 				comp->Serialize(componentArchive);
 			}
 		}
 	}
+
+	PrintWorld();
 }

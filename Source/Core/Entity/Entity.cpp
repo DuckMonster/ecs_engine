@@ -7,12 +7,10 @@ Entity::Entity(const entity_id id, const FName& name) :
 	m_Id(id),
 	m_Name(name)
 {
-	Debug_Log("Entity Created: %s", m_Name.c_str());
 }
 
 Entity::~Entity()
 {
-	Debug_Log("Entity Destroyed: %s", m_Name.c_str());
 }
 
 Component* Entity::AddComponent(const ComponentType& type)

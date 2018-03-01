@@ -7,6 +7,16 @@ void RenderSystem::RunBegin()
 {
 	m_RenderSingleton = GetWorld()->GetSingletonComponent<RenderSingletonComponent>();
 
+	if (!m_RenderSingleton->m_CurrentCamera)
+	{
+		for (Entity* entity : GetWorld()->GetEntities())
+		{
+			m_RenderSingleton->m_CurrentCamera = entity->GetComponent<CameraComponent>();
+			if (m_RenderSingleton->m_CurrentCamera != nullptr)
+				break;
+		}
+	}
+
 	// Clear screen
 	glClearColor( 0.1f, 0.1f, 0.1f, 1.f );
 	glClear( GL_COLOR_BUFFER_BIT );
@@ -14,7 +24,11 @@ void RenderSystem::RunBegin()
 
 void RenderSystem::RunInternal(Entity* entity, const TransformComponent* transform, const RenderableComponent* renderable)
 {
-	glBindVertexArray(renderable->m_VertexObject);
+	MeshResource* mesh = renderable->m_Mesh;
+	if (!mesh)
+		return;
+
+	glBindVertexArray(mesh->GetVAO());
 	glUseProgram(renderable->m_ShaderProgram);
 
 	GLuint u_Camera = glGetUniformLocation(renderable->m_ShaderProgram, "u_Camera");
@@ -23,10 +37,10 @@ void RenderSystem::RunInternal(Entity* entity, const TransformComponent* transfo
 	GLuint u_Model = glGetUniformLocation(renderable->m_ShaderProgram, "u_Model");
 	glUniformMatrix4fv(u_Model, 1, false, glm::value_ptr(transform->GetMatrix()));
 
-	if (renderable->m_UsingElements)
-		glDrawElements(renderable->m_DrawMode, renderable->m_DrawCount, GL_UNSIGNED_INT, nullptr);
+	if (mesh->GetUsingElements())
+		glDrawElements(mesh->GetDrawMode(), mesh->GetDrawCount(), GL_UNSIGNED_INT, nullptr);
 	else
-		glDrawArrays(renderable->m_DrawMode, 0, renderable->m_DrawCount);
+		glDrawArrays(mesh->GetDrawMode(), 0, mesh->GetDrawCount());
 
 	glBindVertexArray(0);
 }

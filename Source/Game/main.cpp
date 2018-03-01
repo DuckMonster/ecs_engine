@@ -51,6 +51,7 @@ int main(int argv, char** argc)
 
 	//--------------------------------------------------- Main loop
 	World world;
+	world.LoadMap("Resource/Maps/testmap.json");
 
 	while(!glfwWindowShouldClose(window))
 	{

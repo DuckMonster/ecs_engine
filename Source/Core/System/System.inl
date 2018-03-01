@@ -1,4 +1,5 @@
-#include "System.h"
+#include <type_traits>
+
 template<class... TComponents>
 inline void System<TComponents...>::Run()
 {
@@ -24,7 +25,7 @@ template<class... TComponents>
 template<class TToRead, class... TLeft, class... TRead>
 inline void System<TComponents...>::RunFor(Entity* entity, TRead*... readComponents)
 {
-	TToRead* comp = entity->GetComponent<TToRead>();
+	TToRead* comp = entity->GetComponent<std::remove_const<TToRead>::type>();
 	if (!comp)
 		return;
 

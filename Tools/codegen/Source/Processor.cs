@@ -30,11 +30,12 @@ namespace CodeGenerator
 
 		public static void ProcessComponent(Component comp, CodeGenerationManifest manifest)
 		{
-			//---------- Serialize Function
 			string serializeSource = "",
 				initializeSource = "",
-				staticTypeSource = "";
+				staticTypeSource = ""; 
 
+			//---------- Serialize Function
+			if (!comp.HasUserSerialize)
 			{
 				const string SERIALIZE_FORMAT = "archive.Serialize<{0}>(\"{1}\", {2});";
 				StringWriter sourceWriter = new StringWriter();

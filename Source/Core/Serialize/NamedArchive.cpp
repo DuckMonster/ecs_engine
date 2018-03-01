@@ -18,7 +18,7 @@ NamedArchive::Source NamedArchive::Open(const char* path)
 
 	ParseResult result = source.m_Document.Parse(jsonString.c_str());
 	if (!result)
-		printf("Failed to parse JSON file \"%s\": %s (%d)\n", path, GetParseError_En(result.Code()), result.Offset());
+		Debug_Log("Failed to parse JSON file \"%s\": %s (%d)\n", path, GetParseError_En(result.Code()), result.Offset());
 
 	return source;
 }

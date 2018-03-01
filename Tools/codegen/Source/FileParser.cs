@@ -27,6 +27,11 @@ namespace CodeGenerator
 		 */
 		static Regex FUNC_RGX = new Regex(@"\sFUNCTION\s*\(\s*([\w\s,]*)\s*\)\W*(.+?)\s+(\w+)\s*\(\s*([\w\s,&*:]*)\s*\)");
 
+		/* Serialize regex
+		 * No capture groups, this is just to check if we should generate a serialize function for you :)
+		 */
+		static Regex SERIALIZE_RGX = new Regex(@"Serialize\s*\(\s*[\w\s,&*:]*\s*\)\s*override");
+
 		/* Property regex
 		 * Group 1: MetaData
 		 * Group 2: Type
@@ -88,6 +93,7 @@ namespace CodeGenerator
 				comp.MetaData = metadata;
 				comp.Namespaces = namespaces;
 				comp.Id = manifest.Components.Count;
+				comp.HasUserSerialize = SERIALIZE_RGX.Match(match[0].Groups[4].Value).Success;
 
 				// Parse functions
 				{

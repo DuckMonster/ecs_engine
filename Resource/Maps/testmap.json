@@ -7,12 +7,26 @@
 			"components":
 			[
 				{
-					"type": "TransformComponent",
-					"Position": [5.0, 0.0, 0.0],
-					"Scale": [0.2, 0.2, 0.2]
+					"type": "TransformComponent"
 				},
 				{
-					"type": "RenderableComponent"
+					"type": "RenderableComponent",
+					"Mesh": "Resource/Mesh/triangle.fbx"
+				}
+			]
+		},
+		{
+			"name": "OtherEntity",
+			"components":
+			[
+				{
+					"type": "TransformComponent",
+					"Position": [2.0, 0.0, 0.0],
+					"Rotation": [0.0, 90.0, 0.0]
+				},
+				{
+					"type": "RenderableComponent",
+					"Mesh": "Resource/Mesh/triangle.fbx"
 				}
 			]
 		},

@@ -13,5 +13,4 @@ public:
 	RenderSingletonComponent(Entity* entity) : Component(entity) {}
 
 	CameraComponent* m_CurrentCamera = nullptr;
-	int m_TestValue = 0;
 };

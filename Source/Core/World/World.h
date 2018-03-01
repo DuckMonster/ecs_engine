@@ -3,6 +3,7 @@
 
 class Entity;
 class ISystem;
+class Resource;
 
 class World 
 {
@@ -15,14 +16,17 @@ public:
 
 	Entity* CreateEntity(FName& name);
 	Entity* GetEntity(entity_id id);
+	Entity* FindEntity(const FName& name);
 	void DestroyEntity(entity_id id);
 	void DestroyEntity(Entity* entity);
+
+	void LoadMap(const char* path);
 
 private:
 	void PrintWorld();
 	void RunSystems();
 
-	void LoadMap(const char* path);
+	void LoadFromResource();
 
 	//--------------------------------------------------- Singleton stuff
 public:
@@ -39,6 +43,10 @@ private:
 	std::vector<Entity*> m_EntityList;
 	std::unordered_map<entity_id, Entity*> m_EntityLookup;
 	std::vector<ISystem*> m_SystemList;
+
+	//--------------------------------------------------- Map resource
+private:
+	Resource* m_MapResource = nullptr;
 };
 
 #include "World.inl"
