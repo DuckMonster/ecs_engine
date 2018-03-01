@@ -1,6 +1,7 @@
 #pragma once
 #include "ComponentType.h"
 #include "Core/Utils/StringUtils.h"
+#include "PropertyUtils.h"
 
 class Entity;
 class NamedArchive;
@@ -16,47 +17,6 @@ class Component
 		const void* const m_Value;
 		StringFunc const m_StringFunc;
 	};
-
-#define VOIDP_TO_VALUE(type) type& value = *(type*)prop
-
-	template<typename T>
-	static std::string PropertyToString(const void* prop)
-	{
-		VOIDP_TO_VALUE(T);
-
-		std::stringstream stream;
-		stream << value;
-
-		return stream.str();
-	}
-
-	template<>
-	static std::string PropertyToString<glm::vec2>(const void* prop)
-	{
-		VOIDP_TO_VALUE(glm::vec2);
-		return StringUtils::Printf("( %f, %f )", value.x, value.y);
-	}
-
-	template<>
-	static std::string PropertyToString<glm::vec3>(const void* prop)
-	{
-		VOIDP_TO_VALUE(glm::vec3);
-		return StringUtils::Printf("( %f, %f, %f )", value.x, value.y, value.z);
-	}
-
-	template<>
-	static std::string PropertyToString<glm::vec4>(const void* prop)
-	{
-		VOIDP_TO_VALUE(glm::vec4);
-		return StringUtils::Printf("( %f, %f, %f, %f )", value.x, value.y, value.z, value.w);
-	}
-
-	template<>
-	static std::string PropertyToString<glm::quat>(const void* prop)
-	{
-		VOIDP_TO_VALUE(glm::quat);
-		return StringUtils::Printf("( %f | %f, %f, %f )", value.w, value.x, value.y, value.z);
-	}
 
 public:
 	Component(Entity* entity) : m_Entity(entity) {}
@@ -88,5 +48,5 @@ private:
 template<class T>
 void Component::RegisterProperty(const char* name, const void* value)
 {
-	m_PropertyList.push_back(Property(name, value, &Component::PropertyToString<T>));
+	m_PropertyList.push_back(Property(name, value, &propertyutils::PropertyToString<T>));
 }
