@@ -35,7 +35,7 @@ void World::DoFrame()
 	//-------------------- Print frame rate
 	static float FRAME_TIMER = 0.f;
 
-	if ((FRAME_TIMER += FTime::FrameDelta()) > 1.f)
+	if ((FRAME_TIMER += Time::FrameDelta()) > 1.f)
 	{
 		FRAME_TIMER = 0.f;
 		//Debug_Log("Hello World, MS = %f", delta);
@@ -45,7 +45,7 @@ void World::DoFrame()
 #if DEBUG
 	static float UPDATE_TIMER = 0.f;
 
-	if ((UPDATE_TIMER += FTime::FrameDelta()) > 0.5f)
+	if ((UPDATE_TIMER += Time::FrameDelta()) > 0.5f)
 	{
 		//if (m_MapResource->HasChanged())
 		//	LoadFromResource();
@@ -133,7 +133,7 @@ void World::LoadMap(const char* path)
 		return;
 
 	m_MapResource = ResourceManager::GetInstance()->Load(path);
-	m_MapResource->m_OnReloadDispatcher.Bind(this, MapResourceReloadedHandler);
+	m_MapResource->m_OnHotReloaded.Bind(this, MapResourceReloadedHandler);
 
 	LoadFromResource();
 }

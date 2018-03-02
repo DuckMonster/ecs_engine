@@ -12,5 +12,5 @@ void BehaviourSystem::RunInternal(Entity* entity, BehaviourComponent* behaviour)
 	if (!function.IsValid())
 		return;
 
-	function.Call(entity, FTime::FrameDelta());
+	function.Call(entity, Time::FrameDelta());
 }

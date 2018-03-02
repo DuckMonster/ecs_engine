@@ -3,6 +3,7 @@
 #include "Common/hash.h"
 #include "Core/Utils/SingletonClass.h"
 #include "Core/Utils/Time.h"
+#include "Core/Utils/Timer.h"
 
 class Resource;
 class MeshResource;
@@ -24,6 +25,8 @@ private:
 
 	std::unordered_map<Hash::Type, Resource*> m_ResourceMap;
 	std::vector<Resource*> m_HotloadResources;
+
+	Timer m_HotReloadTimer = Timer(0.5f);
 };
 
 /**	Get Or Create Resource

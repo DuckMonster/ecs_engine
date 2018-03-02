@@ -40,7 +40,7 @@
 				},
 				{
 					"type": "BehaviourComponent",
-					"Script": "Resource/Script/testscript.as"
+					"Script": "Resource/Script/other.as"
 				}
 			]
 		},

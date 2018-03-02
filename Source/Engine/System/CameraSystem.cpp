@@ -24,9 +24,9 @@ void CameraSystem::RunInternal(Entity* entity, TransformComponent* transform, Ca
 		return;
 
 	transform->SetPosition(vec3(
-		sin(FTime::TotalElapsed()), 
+		sin(Time::TotalElapsed()), 
 		1.f,
-		cos(FTime::TotalElapsed())
+		cos(Time::TotalElapsed())
 	) * 5.f);
 	transform->LookAt(vec3());
 

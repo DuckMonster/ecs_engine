@@ -4,6 +4,7 @@
 #include "MeshResource.h"
 #include "ScriptResource.h"
 #include "Core/Utils/File.h"
+#include "Core/Utils/Time.h"
 
 
 /**	Load
@@ -58,15 +59,23 @@ void ResourceManager::Release(Resource* resource)
 *******************************************************************************/
 void ResourceManager::UpdateResourceHotReloading()
 {
-	for (Resource* res : m_HotloadResources)
+	m_HotReloadTimer.Update(Time::FrameDelta());
+	if (m_HotReloadTimer.IsDone())
 	{
-		if (res->HasChanged())
+		m_HotReloadTimer.Reset();
+
+		std::vector<Resource*> resourcesToReload;
+
+		for (Resource* res : m_HotloadResources)
+		{
+			if (res->HasChanged())
+				resourcesToReload.push_back(res);
+		}
+
+		for (Resource* res : resourcesToReload)
 		{
 			Debug_Log("Hot-reloading \"%s\"...", res->GetPath());
-
-			res->Release();
-			res->Load(res->GetPath());
-			res->m_OnReloadDispatcher.Broadcast(res);
+			res->HotReload();
 		}
 	}
 }

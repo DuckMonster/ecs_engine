@@ -32,7 +32,7 @@ void Program::DoFrame()
 	ResourceManager::GetInstance()->UpdateResourceHotReloading();
 
 	// Update delta
-	FTime::UpdateDelta();
+	Time::UpdateDelta();
 
 	// Run world
 	m_World->DoFrame();

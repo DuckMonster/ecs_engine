@@ -18,7 +18,7 @@ private:
 	timepoint	m_TimePoint;
 };
 
-class FTime
+class Time
 {
 public:
 	static float FrameDelta() { return m_FrameDelta; }

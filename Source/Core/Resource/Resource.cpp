@@ -23,8 +23,6 @@ bool Resource::Load(const char* path)
 	m_Path = path;
 	m_ModifiedTime = GetModifiedTime();
 
-	m_OnReloadDispatcher.Broadcast(this);
-
 	return true;
 }
 
@@ -32,6 +30,16 @@ bool Resource::Load(const char* path)
 *******************************************************************************/
 void Resource::Release()
 {
+	m_OnReleased.Broadcast(this);
+}
+
+/**	Hot Reload
+*******************************************************************************/
+void Resource::HotReload()
+{
+	Release();
+	Load(m_Path.c_str());
+	m_OnHotReloaded.Broadcast(this);
 }
 
 /**	Get Modified Time

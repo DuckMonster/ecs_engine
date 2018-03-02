@@ -1,9 +1,9 @@
 #pragma once
 
-class CTimer
+class Timer
 {
 public:
-	CTimer( float duration, float value = 0.f );
+	Timer( float duration, float value = 0.f );
 	void Update( float delta );
 
 	const float& Value() const { return m_Value; }

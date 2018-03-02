@@ -4,10 +4,10 @@
 using namespace std;
 using namespace std::chrono;
 
-FTimePoint FTime::m_Start;
-FTimePoint FTime::m_PreviousDeltaPoint;
-float FTime::m_FrameDelta = 0.f;
-bool FTime::m_FirstFrame = true;
+FTimePoint Time::m_Start;
+FTimePoint Time::m_PreviousDeltaPoint;
+float Time::m_FrameDelta = 0.f;
+bool Time::m_FirstFrame = true;
 
 //--------------------------------------------------- TIME POINT
 
@@ -35,7 +35,7 @@ float FTimePoint::Elapsed( )
 
 /**	Update Delta
 *******************************************************************************/
-void FTime::UpdateDelta()
+void Time::UpdateDelta()
 {
 	FTimePoint now;
 	m_FrameDelta = now - m_PreviousDeltaPoint;

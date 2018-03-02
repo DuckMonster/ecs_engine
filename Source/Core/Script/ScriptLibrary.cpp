@@ -37,19 +37,19 @@ namespace
 
 //--------------------------------------------------- Time
 #include "Core/Utils/Time.h"
-namespace Time
+namespace TimeFunc
 {
 	/**	Time::Elapsed
 	*******************************************************************************/
 	float Elapsed()
 	{
-		return FTime::TotalElapsed();
+		return Time::TotalElapsed();
 	}
 }
 
 //--------------------------------------------------- Entity
 #include "Core/Entity/Entity.h"
-namespace EntityFuncs
+namespace EntityFunc
 {
 	/**	Get Name
 	*******************************************************************************/
@@ -70,12 +70,12 @@ void RegisterDefaultScriptLibrary(class asIScriptEngine* engine)
 	//--------------------------------------------------- Time
 	{
 		NamespaceScope scope(engine, "Time");
-		REGISTER_FUNC("float Elapsed()", Time::Elapsed);
+		REGISTER_FUNC("float Elapsed()", TimeFunc::Elapsed);
 	}
 
 	//--------------------------------------------------- Entity
 	{
 		engine->RegisterObjectType("Entity", sizeof(Entity), asOBJ_REF | asOBJ_NOCOUNT);
-		engine->RegisterObjectMethod("Entity", "string GetName()", asFUNCTION(EntityFuncs::GetName), asCALL_CDECL_OBJLAST);
+		engine->RegisterObjectMethod("Entity", "string GetName()", asFUNCTION(EntityFunc::GetName), asCALL_CDECL_OBJLAST);
 	}
 }

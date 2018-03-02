@@ -14,6 +14,7 @@ public:
 
 	virtual bool Load(const char* path);
 	virtual void Release();
+	virtual void HotReload();
 
 	const ResourceManager* GetManager() const { return m_Manager; }
 	const char* GetPath() const { return m_Path.c_str(); }
@@ -24,7 +25,8 @@ public:
 
 	bool Equals(const Resource* other) const;
 
-	DelegateDispatcher<void, Resource*> m_OnReloadDispatcher;
+	DelegateDispatcher<void, Resource*> m_OnHotReloaded;
+	DelegateDispatcher<void, Resource*> m_OnReleased;
 
 private:
 	ResourceManager* const m_Manager;
