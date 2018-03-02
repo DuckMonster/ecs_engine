@@ -116,13 +116,6 @@ void World::DestroyEntity(entity_id id)
 		m_EntityList.erase(it);
 }
 
-/**	Shit
-*******************************************************************************/
-void Shit(Resource* res)
-{
-	Debug_Log("Shit(res)");
-}
-
 /**	Map Resource Reloaded
 *******************************************************************************/
 void MapResourceReloadedHandler(World* world, Resource* resource) { world->MapResourceReloaded(resource); }
@@ -140,7 +133,6 @@ void World::LoadMap(const char* path)
 		return;
 
 	m_MapResource = ResourceManager::GetInstance()->Load(path);
-	m_MapResource->m_OnReloadDispatcher.Bind(Shit);
 	m_MapResource->m_OnReloadDispatcher.Bind(this, MapResourceReloadedHandler);
 
 	LoadFromResource();
