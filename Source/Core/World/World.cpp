@@ -47,10 +47,10 @@ void World::DoFrame()
 
 	if ((UPDATE_TIMER += FTime::FrameDelta()) > 0.5f)
 	{
-		if (m_MapResource->HasChanged())
-			LoadFromResource();
+		//if (m_MapResource->HasChanged())
+		//	LoadFromResource();
 
-		UPDATE_TIMER = 0.f;
+		//UPDATE_TIMER = 0.f;
 	}
 #endif
 
@@ -116,6 +116,22 @@ void World::DestroyEntity(entity_id id)
 		m_EntityList.erase(it);
 }
 
+/**	Shit
+*******************************************************************************/
+void Shit(Resource* res)
+{
+	Debug_Log("Shit(res)");
+}
+
+/**	Map Resource Reloaded
+*******************************************************************************/
+void MapResourceReloadedHandler(World* world, Resource* resource) { world->MapResourceReloaded(resource); }
+void World::MapResourceReloaded(Resource* resource)
+{
+	Debug_Log("World::MapResourceReloaded");
+	LoadFromResource();
+}
+
 /**	Load Map
 *******************************************************************************/
 void World::LoadMap(const char* path)
@@ -124,6 +140,9 @@ void World::LoadMap(const char* path)
 		return;
 
 	m_MapResource = ResourceManager::GetInstance()->Load(path);
+	m_MapResource->m_OnReloadDispatcher.Bind(Shit);
+	m_MapResource->m_OnReloadDispatcher.Bind(this, MapResourceReloadedHandler);
+
 	LoadFromResource();
 }
 

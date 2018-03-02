@@ -1,4 +1,5 @@
 #pragma once
+#include "Core/Delegate/DelegateDispatcher.h"
 
 class ResourceManager;
 
@@ -22,6 +23,8 @@ public:
 	bool HasChanged();
 
 	bool Equals(const Resource* other) const;
+
+	DelegateDispatcher<void, Resource*> m_OnReloadDispatcher;
 
 private:
 	ResourceManager* const m_Manager;

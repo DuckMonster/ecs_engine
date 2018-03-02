@@ -16,13 +16,18 @@ public:
 	ScriptResource* LoadScript(const char* path);
 	void Release(Resource* resource);
 
+	void UpdateResourceHotReloading();
+
 private:
 	template<typename TResource>
 	TResource* GetOrCreateResource(const char* path);
 
 	std::unordered_map<Hash::Type, Resource*> m_ResourceMap;
+	std::vector<Resource*> m_HotloadResources;
 };
 
+/**	Get Or Create Resource
+*******************************************************************************/
 template<typename TResource>
 TResource* ResourceManager::GetOrCreateResource(const char* path)
 {
@@ -54,6 +59,7 @@ TResource* ResourceManager::GetOrCreateResource(const char* path)
 	Debug_Log("\"%s\" loaded (%f seconds)", path, timePoint.Elapsed());
 
 	m_ResourceMap[hash] = resource;
+	m_HotloadResources.push_back(resource);
 
 	return resource;
 }

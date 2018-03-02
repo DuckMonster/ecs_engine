@@ -21,6 +21,7 @@ public:
 	void DestroyEntity(Entity* entity);
 
 	void LoadMap(const char* path);
+	void MapResourceReloaded(Resource* resource);
 
 private:
 	void PrintWorld();

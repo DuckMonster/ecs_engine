@@ -1,11 +1,8 @@
 #include "CorePCH.h"
-#include <stdio.h>
 #include <GLFW/glfw3.h>
 #include <chrono>
-#include "Core/World/World.h"
 #include "Core/Context/Context.h"
-#include "Core/Component/ComponentType.h"
-#include "Core/Utils/Time.h"
+#include "Core/Program/Program.h"
 
 void HandleKeyEvent(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
@@ -15,7 +12,7 @@ void HandleKeyEvent(GLFWwindow* window, int key, int scancode, int action, int m
 		glfwDestroyWindow(window);
 }
 
-void DoFrame(World* world);
+void DoFrame(Program* program);
 
 int main(int argv, char** argc)
 {
@@ -47,16 +44,12 @@ int main(int argv, char** argc)
 	glfwGetWindowPos(window, &context->width, &context->height);
 	glfwGetFramebufferSize(window, &context->width, &context->height);
 
-	//--------------------------------------------------- Init components
-	ComponentType::InitializeTypes();
-
 	//--------------------------------------------------- Main loop
-	World world;
-	world.LoadMap("Resource/Maps/testmap.json");
+	Program program;
 
 	while(!glfwWindowShouldClose(window))
 	{
-		DoFrame(&world);
+		DoFrame(&program);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -65,8 +58,7 @@ int main(int argv, char** argc)
 	return 0;
 }	
 
-void DoFrame(World* world)
+void DoFrame(Program* program)
 {
-	FTime::UpdateDelta();
-	world->DoFrame();
+	program->DoFrame();
 }

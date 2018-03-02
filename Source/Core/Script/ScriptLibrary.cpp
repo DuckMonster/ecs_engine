@@ -30,7 +30,8 @@ namespace
 	*******************************************************************************/
 	void Print(std::string message)
 	{
-		Debug_Log_Minimal(message.c_str());
+		//Debug_Log_Minimal(message.c_str());
+		printf("%s\n", message.c_str());
 	}
 }
 
