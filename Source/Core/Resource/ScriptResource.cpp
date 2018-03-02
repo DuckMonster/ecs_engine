@@ -3,6 +3,7 @@
 #include <angelscript.h>
 #include "AngelScript/add_on/scriptbuilder/scriptbuilder.h"
 #include "Core/Script/ScriptEngine.h"
+#include "Core/Script/ScriptFunction.h"
 #include "Core/Utils/File.h"
 
 namespace
@@ -36,12 +37,12 @@ namespace
 *******************************************************************************/
 bool ScriptResource::Load(const char* path)
 {
-	m_ModuleName = GetModuleNameFromPath(path);
+	std::string moduleName = GetModuleNameFromPath(path);
 
 	CScriptBuilder builder;
 	asIScriptEngine* engine = ScriptEngine::GetInstance()->GetAngelScriptEngine();
 
-	if (!Ensure(builder.StartNewModule(engine, m_ModuleName.c_str()) >= 0))
+	if (!Ensure(builder.StartNewModule(engine, moduleName.c_str()) >= 0))
 		return false;
 
 	if (!Ensure(builder.AddSectionFromFile(path) >= 0))
@@ -50,7 +51,7 @@ bool ScriptResource::Load(const char* path)
 	if (!Ensure(builder.BuildModule() >= 0))
 		return false;
 
-	m_Module = engine->GetModule(m_ModuleName.c_str());
+	m_Module = engine->GetModule(moduleName.c_str());
 	return Resource::Load(path);
 }
 
@@ -59,7 +60,19 @@ bool ScriptResource::Load(const char* path)
 void ScriptResource::Release()
 {
 	asIScriptEngine* engine = ScriptEngine::GetInstance()->GetAngelScriptEngine();
-	engine->DiscardModule(m_ModuleName.c_str());
+	engine->DiscardModule(m_Module->GetName());
+
+	m_Module = nullptr;
+}
+
+/**	Get Function
+*******************************************************************************/
+ScriptFunction ScriptResource::GetFunction(const char* declaration)
+{
+	if (!Ensure(m_Module != nullptr))
+		return ScriptFunction();
+
+	return ScriptFunction(m_Module->GetName(), declaration);
 }
 
 #include "ResourceManager.h"

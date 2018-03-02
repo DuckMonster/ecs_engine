@@ -5,6 +5,7 @@
 #include "Core/World/World.h"
 #include "Core/Context/Context.h"
 #include "Core/Component/ComponentType.h"
+#include "Core/Utils/Time.h"
 
 void HandleKeyEvent(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
@@ -66,23 +67,6 @@ int main(int argv, char** argc)
 
 void DoFrame(World* world)
 {
-	using namespace std::chrono;
-	using hr_clock = high_resolution_clock;
-	static hr_clock::time_point LAST_FRAME;
-	static bool IS_FIRST_FRAME = true;
-
-	//--------------------------------------------------- Calculate frame time
-	if (IS_FIRST_FRAME)
-	{
-		// We want to avoid huge deltas on the first frame
-		LAST_FRAME = hr_clock::now();
-		IS_FIRST_FRAME = false;
-	}
-
-	hr_clock::time_point frame = hr_clock::now();
-	float delta = duration_cast<microseconds>(frame - LAST_FRAME).count() * 1.e-6f;
-	LAST_FRAME = frame;
-	//----
-
-	world->DoFrame(delta);
+	FTime::UpdateDelta();
+	world->DoFrame();
 }

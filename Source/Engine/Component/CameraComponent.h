@@ -22,9 +22,6 @@ public:
 	PROPERTY(Serialize)
 	float m_FieldOfView = 45.f;
 
-	PROPERTY(Serialize)
-	ScriptResource* m_Script = nullptr;
-
 	glm::mat4 m_ViewMatrix;
 	glm::mat4 m_CameraMatrix;
 	glm::mat4 m_ProjectionMatrix;

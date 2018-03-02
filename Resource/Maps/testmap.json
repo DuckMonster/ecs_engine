@@ -17,6 +17,10 @@
 				{
 					"type": "RenderableComponent",
 					"Mesh": "Resource/Mesh/triangle.fbx"
+				},
+				{
+					"type": "BehaviourComponent",
+					"Script": "Resource/Script/testscript.as"
 				}
 			]
 		},
@@ -33,6 +37,10 @@
 				{
 					"type": "RenderableComponent",
 					"Mesh": "Resource/Mesh/triangle.fbx"
+				},
+				{
+					"type": "BehaviourComponent",
+					"Script": "Resource/Script/testscript.as"
 				}
 			]
 		},

@@ -19,6 +19,7 @@ World::World()
 {
 	m_SystemList.push_back(new CameraSystem(this));
 	m_SystemList.push_back(new RenderSystem(this));
+	m_SystemList.push_back(new BehaviourSystem(this));
 }
 
 /**	Destructor
@@ -29,12 +30,12 @@ World::~World()
 
 /**	Do Frame
 *******************************************************************************/
-void World::DoFrame(float delta)
+void World::DoFrame()
 {
 	//-------------------- Print frame rate
 	static float FRAME_TIMER = 0.f;
 
-	if ((FRAME_TIMER += delta) > 1.f)
+	if ((FRAME_TIMER += FTime::FrameDelta()) > 1.f)
 	{
 		FRAME_TIMER = 0.f;
 		//Debug_Log("Hello World, MS = %f", delta);
@@ -44,7 +45,7 @@ void World::DoFrame(float delta)
 #if DEBUG
 	static float UPDATE_TIMER = 0.f;
 
-	if ((UPDATE_TIMER += delta) > 0.5f)
+	if ((UPDATE_TIMER += FTime::FrameDelta()) > 0.5f)
 	{
 		if (m_MapResource->HasChanged())
 			LoadFromResource();

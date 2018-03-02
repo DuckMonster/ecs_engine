@@ -21,9 +21,14 @@ private:
 class FTime
 {
 public:
-	static float TotalElapsed( ) { return m_Start.Elapsed( ); }
+	static float FrameDelta() { return m_FrameDelta; }
+	static void UpdateDelta();
+	static float TotalElapsed() { return m_Start.Elapsed(); }
 	static void Reset( ) { m_Start = FTimePoint( ); }
 
 private:
 	static FTimePoint	m_Start;
+	static FTimePoint	m_PreviousDeltaPoint;
+	static float		m_FrameDelta;
+	static bool			m_FirstFrame;
 };

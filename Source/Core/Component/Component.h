@@ -33,6 +33,7 @@ public:
 
 	void DebugPrint();
 	virtual void Serialize(NamedArchive& archive);
+	virtual void OnSerialized() {}
 
 protected:
 	template<class T>

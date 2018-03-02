@@ -2,6 +2,7 @@
 #include "Resource.h"
 
 class asIScriptModule;
+class ScriptFunction;
 
 class ScriptResource : public Resource
 {
@@ -11,9 +12,10 @@ public:
 	bool Load(const char* path) override;
 	void Release() override;
 
+	ScriptFunction GetFunction(const char* declaration);
+
 private:
 	asIScriptModule* m_Module;
-	std::string m_ModuleName;
 };
 
 #include "Core/Serialize/NamedArchive.h"

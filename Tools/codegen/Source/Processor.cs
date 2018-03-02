@@ -53,6 +53,8 @@ namespace CodeGenerator
 					sourceWriter.WriteLine(SERIALIZE_FORMAT, prop.Parameter.Type, prop.CleanName, prop.Parameter.Name);
 				}
 
+				sourceWriter.WriteLine("OnSerialized();");
+
 				serializeSource = sourceWriter.ToString();
 				generatedFunctions.Add(ConstructFunction("public", "void", "Serialize", "", "override", serializeSource, ConstructParameter("NamedArchive&", "archive")));
 			}

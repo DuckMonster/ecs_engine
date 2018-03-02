@@ -4,6 +4,8 @@
 #include "Core/Utils/Time.h"
 #include "Core/Context/Context.h"
 #include <glm/gtc/matrix_access.hpp>
+#include "Core/Resource/ScriptResource.h"
+#include "Core/Script/ScriptFunction.h"
 
 using namespace glm;
 

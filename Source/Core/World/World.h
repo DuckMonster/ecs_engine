@@ -11,7 +11,7 @@ public:
 	World();
 	~World();
 
-	void DoFrame(float delta);
+	void DoFrame();
 	const std::vector<Entity*>& GetEntities() const { return m_EntityList; }
 
 	Entity* CreateEntity(FName& name);
