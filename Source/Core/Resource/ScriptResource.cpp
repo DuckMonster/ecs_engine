@@ -59,6 +59,9 @@ bool ScriptResource::Load(const char* path)
 *******************************************************************************/
 void ScriptResource::Release()
 {
+	if (m_Module == nullptr)
+		return;
+
 	asIScriptEngine* engine = ScriptEngine::GetInstance()->GetAngelScriptEngine();
 	engine->DiscardModule(m_Module->GetName());
 

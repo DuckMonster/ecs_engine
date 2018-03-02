@@ -6,7 +6,7 @@ void OnBehaviour(Entity& entity, float delta)
 
 	if (timer < 0.0)
 	{
-		Print(entity.GetName() + " says FUCK YOUUUUUUU!");
+		Print(entity.GetName() + " says Sydney Är Crazy!");
 		timer = 0.2;
 	}
 

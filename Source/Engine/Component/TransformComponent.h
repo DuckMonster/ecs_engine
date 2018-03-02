@@ -26,6 +26,7 @@ public:
 	glm::vec3 GetRight() const;
 
 	glm::mat4 GetMatrix() const;
+	int m_TestProp = 5;
 
 private:
 	PROPERTY(Serialize)
@@ -36,6 +37,7 @@ private:
 
 	PROPERTY(Serialize)
 	glm::quat m_Rotation = glm::quat(1.f, 0.f, 0.f, 0.f);
+
 
 	mutable glm::mat4 m_LocalMatrix = glm::mat4(1.f);
 	mutable glm::mat4 m_LocalMatrixInv = glm::mat4(1.f);

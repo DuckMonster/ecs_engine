@@ -17,10 +17,6 @@
 				{
 					"type": "RenderableComponent",
 					"Mesh": "Resource/Mesh/triangle.fbx"
-				},
-				{
-					"type": "BehaviourComponent",
-					"Script": "Resource/Script/testscript.as"
 				}
 			]
 		},
@@ -37,10 +33,6 @@
 				{
 					"type": "RenderableComponent",
 					"Mesh": "Resource/Mesh/triangle.fbx"
-				},
-				{
-					"type": "BehaviourComponent",
-					"Script": "Resource/Script/other.as"
 				}
 			]
 		},
@@ -57,6 +49,10 @@
 				{
 					"type": "RenderableComponent",
 					"Mesh": "Resource/Mesh/triangle.fbx"
+				},
+				{
+					"type": "BehaviourComponent",
+					"Script": "Resource/Script/testscript.as"
 				}
 			]
 		},
@@ -72,8 +68,7 @@
 					"type": "CameraComponent",
 					"Far": 10.0,
 					"Near": 2.0,
-					"Perspective": false,
-					"Script": "Resource/Script/testscript.as"
+					"Perspective": true
 				}
 			]
 		}
