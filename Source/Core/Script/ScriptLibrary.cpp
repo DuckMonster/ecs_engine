@@ -112,7 +112,8 @@ void RegisterDefaultScriptLibrary(class asIScriptEngine* engine)
 		engine->RegisterObjectType("TransformComponent", 0, asOBJ_REF | asOBJ_NOCOUNT);
 		engine->RegisterObjectProperty("TransformComponent", "int TestProp", asOFFSET(TransformComponent, m_TestProp));
 		engine->RegisterObjectMethod("TransformComponent", "vec3& get_Position() const", asMETHOD(TransformComponent, GetPosition), asCALL_THISCALL);
-		engine->RegisterObjectMethod("TransformComponent", "void set_Position(vec3 position)", asMETHOD(TransformComponent, SetPosition), asCALL_THISCALL);
+		engine->RegisterObjectMethod("TransformComponent", "void set_Position(const vec3 position)", asMETHOD(TransformComponent, SetPosition), asCALL_THISCALL);
+		engine->RegisterObjectMethod("TransformComponent", "void LookAt(const vec3 location, const vec3 up)", asMETHOD(TransformComponent, LookAt), asCALL_THISCALL);
 
 		engine->RegisterObjectMethod("Entity", "TransformComponent& get_Transform()", asFUNCTION(EntityFunc::GetTransform), asCALL_CDECL_OBJLAST);
 	}

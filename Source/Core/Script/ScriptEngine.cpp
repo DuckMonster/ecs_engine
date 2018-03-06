@@ -3,6 +3,7 @@
 #include "Core/Utils/File.h"
 #include <angelscript.h>
 #include "AngelScript/add_on/scriptstdstring/scriptstdstring.h"
+#include "AngelScript/add_on/scriptmath/scriptmath.h"
 #include "ScriptLibrary.h"
 
 namespace 
@@ -38,6 +39,7 @@ ScriptEngine::ScriptEngine()
 	m_Engine = asCreateScriptEngine();
 	m_Engine->SetMessageCallback(asFUNCTION(MessageCallback), 0, asCALL_CDECL);
 	RegisterStdString(m_Engine);
+	RegisterScriptMath(m_Engine);
 	RegisterDefaultScriptLibrary(m_Engine);
 }
 
