@@ -23,13 +23,6 @@ void CameraSystem::RunInternal(Entity* entity, TransformComponent* transform, Ca
 	if (camera != m_RenderSingleton->m_CurrentCamera)
 		return;
 
-	transform->SetPosition(vec3(
-		sin(Time::TotalElapsed()), 
-		1.f,
-		cos(Time::TotalElapsed())
-	) * 5.f);
-	transform->LookAt(vec3());
-
 	{
 		// Get matrix from rotation
 		quat rotation = transform->GetRotation();

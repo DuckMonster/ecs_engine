@@ -26,7 +26,6 @@ public:
 	glm::vec3 GetRight() const;
 
 	glm::mat4 GetMatrix() const;
-	int m_TestProp = 5;
 
 private:
 	PROPERTY(Serialize)

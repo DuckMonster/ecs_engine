@@ -15,7 +15,7 @@ public:
 	ScriptFunction GetFunction(const char* declaration);
 
 private:
-	asIScriptModule* m_Module;
+	asIScriptModule* m_Module = nullptr;
 };
 
 #include "Core/Serialize/NamedArchive.h"

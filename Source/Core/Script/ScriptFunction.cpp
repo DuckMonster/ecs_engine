@@ -22,11 +22,6 @@ ScriptFunction::ScriptFunction(const char* module, const char* declaration)
 	asIScriptModule* asModule = asEngine->GetModule(module);
 
 	m_Function = asModule->GetFunctionByDecl(declaration);
-
-	if (!m_Function)
-	{
-		Debug_Log("Failed to find function \"%s\" in module \"%s\"", declaration, module);
-	}
 }
 
 /**	Destructor
@@ -40,7 +35,7 @@ ScriptFunction::~ScriptFunction()
 *******************************************************************************/
 void ScriptFunction::PrepareContext()
 {
-	if (!Ensure(IsValid()))
+	if (!IsValid())
 		return;
 
 	ScriptEngine* engine = ScriptEngine::GetInstance();

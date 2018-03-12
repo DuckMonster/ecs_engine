@@ -53,8 +53,9 @@ TResource* ResourceManager::GetOrCreateResource(const char* path)
 	FTimePoint timePoint;
 	Debug_Log("Loading resource \"%s\"...", path);
 
-	if (!Ensure(resource->Load(path)))
+	if (!resource->Load(path))
 	{
+		Debug_Log("Resource \"%s\" failed to load", path);
 		delete resource;
 		return nullptr;
 	}

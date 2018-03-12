@@ -8,7 +8,7 @@ void BehaviourSystem::RunInternal(Entity* entity, BehaviourComponent* behaviour)
 	if (behaviour->m_Script == nullptr)
 		return;
 
-	ScriptFunction function = behaviour->m_Script->GetFunction("void OnBehaviour(Entity&, float)");
+	ScriptFunction function = behaviour->m_Script->GetFunction("void OnBehaviour(Entity@, float)");
 	if (!function.IsValid())
 		return;
 

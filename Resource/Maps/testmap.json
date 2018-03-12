@@ -2,53 +2,49 @@
 	"name": "My Testmap",
 	"camera": "Camera",
 
-	"entities":
-	[
+	"entities": [
 		{
 			"name": "PlayerEntity",
-			"components":
-			[
+			"components": [
 				{
 					"type": "TransformComponent",
-					"Position": [0.5, 0.0, 0.0],
-					"Rotation": [0.0, 0.0, 0.0],
-					"Scale": [1.0, 1.0, 1.0]
+					"Position": [ 0.5, 0.0, 0.0 ],
+					"Rotation": [ 0.0, 0.0, 0.0 ],
+					"Scale": [ 1.0, 1.0, 1.0 ]
 				},
 				{
 					"type": "RenderableComponent",
-					"Mesh": "Resource/Mesh/triangle.fbx"
+					"Mesh": "Resource/Mesh/cube.fbx"
 				}
 			]
 		},
 		{
 			"name": "OtherEntity",
-			"components":
-			[
+			"components": [
 				{
 					"type": "TransformComponent",
-					"Position": [-0.5, 0.0, 0.0],
-					"Rotation": [0.0, 0.0, 0.0],
-					"Scale": [1.0, 1.0, 1.0]
+					"Position": [ -0.5, 0.0, 0.0 ],
+					"Rotation": [ 0.0, 0.0, 0.0 ],
+					"Scale": [ 1.0, 1.0, 1.0 ]
 				},
 				{
 					"type": "RenderableComponent",
-					"Mesh": "Resource/Mesh/triangle.fbx"
+					"Mesh": "Resource/Mesh/cube.fbx"
 				}
 			]
 		},
 		{
 			"name": "ThirdEntity",
-			"components":
-			[
+			"components": [
 				{
 					"type": "TransformComponent",
-					"Position": [0.0, 1.0, 0.0],
-					"Rotation": [0.0, 0.0, 0.0],
-					"Scale": [1.0, 1.0, 1.0]
+					"Position": [ 0.0, 1.0, 0.0 ],
+					"Rotation": [ 90.0, 10.0, 42.0 ],
+					"Scale": [ 1.0, 1.0, 1.0 ]
 				},
 				{
 					"type": "RenderableComponent",
-					"Mesh": "Resource/Mesh/triangle.fbx"
+					"Mesh": "Resource/Mesh/cube.fbx"
 				},
 				{
 					"type": "BehaviourComponent",
@@ -58,17 +54,21 @@
 		},
 		{
 			"name": "Camera",
-			"components":
-			[
+			"components": [
 				{
 					"type": "TransformComponent",
-					"Position": [0.0, 5.0, 5.0]
+					"Position": [ 0.0, 0.0, 5.0 ],
+					"Rotation": [ 0.0, 90.0, 0.0 ]
 				},
 				{
 					"type": "CameraComponent",
 					"Far": 10.0,
 					"Near": 2.0,
 					"Perspective": true
+				},
+				{
+					"type": "BehaviourComponent",
+					"Script": "Resource/Script/camerascript.as"
 				}
 			]
 		}

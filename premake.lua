@@ -35,7 +35,7 @@ project "Game"
 		["Resource/*"] = { "Resource/* "}
 	}
 
-	systemversion "10.0.16299.0"
+	-- systemversion "10.0.16299.0"
 
 	objdir "Build/obj/"
 	targetsuffix "_%{cfg.buildcfg}"
@@ -43,10 +43,14 @@ project "Game"
 	pchheader "CorePCH.h"
 	pchsource "Source/CorePCH.cpp"
 
-	includedirs { "Dependency/include", "D:/Personal/Programming/C++/!Common", "Source", "Build/gen" }
+	includedirs { "Dependency/include", "Source", "Build/gen" }
 
 	prebuildcommands {
 		"\"%{wks.location}..\\Bin\\CodeGen\\CodeGen.exe\" \"%{wks.location}..\\Source\" \"%{wks.location}gen\""
+	}
+
+	postbuildcommands {
+		"{COPY} \"../Dependency/dll/%{cfg.buildcfg}/*\" %{cfg.buildtarget.directory}"
 	}
 	
 	links { "angelscript64" }
@@ -69,7 +73,7 @@ project "Game"
 
 	filter "Debug or Release"
 		defines { "GLEW_STATIC" }
-		links { "opengl32", "glfw3", "SOIL" }
+		links { "opengl32", "glfw3", "SOIL", "assimp.lib" }
 
 	filter "DebugServer or ReleaseServer"
 		defines { "GAME_HEADLESS" }

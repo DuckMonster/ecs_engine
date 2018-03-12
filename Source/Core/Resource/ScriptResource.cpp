@@ -48,10 +48,11 @@ bool ScriptResource::Load(const char* path)
 	if (!Ensure(builder.AddSectionFromFile(path) >= 0))
 		return false;
 
-	if (!Ensure(builder.BuildModule() >= 0))
-		return false;
+	// It's OK if the module doesn't build properly, just move on
+	// We want to keep the resource around anyways for hot-reloading
+	if (builder.BuildModule() <= 0)
+		m_Module = engine->GetModule(moduleName.c_str());
 
-	m_Module = engine->GetModule(moduleName.c_str());
 	return Resource::Load(path);
 }
 
@@ -72,7 +73,8 @@ void ScriptResource::Release()
 *******************************************************************************/
 ScriptFunction ScriptResource::GetFunction(const char* declaration)
 {
-	if (!Ensure(m_Module != nullptr))
+	// Not having a module is fine, it just means the script didn't compile
+	if (!m_Module)
 		return ScriptFunction();
 
 	return ScriptFunction(m_Module->GetName(), declaration);

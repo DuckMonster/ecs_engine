@@ -1,6 +1,6 @@
 float timer = 1.0;
 
-void OnBehaviour(Entity& entity, float delta)
+void OnBehaviour(Entity@ entity, float delta)
 {
 	timer -= delta;
 

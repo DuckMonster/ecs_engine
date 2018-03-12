@@ -1,5 +1,8 @@
 #include "CorePCH.h"
 #include "MeshResource.h"
+#include <assimp/scene.h>
+#include <assimp/Importer.hpp>
+#include <assimp/postprocess.h>
 
 /**	Load
 *******************************************************************************/
@@ -11,6 +14,24 @@ bool MeshResource::Load(const char* path)
 		0.f, 0.5f, 0.f
 	};
 
+	Assimp::Importer importer;
+	const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate);
+
+	if (!scene)
+	{
+		Debug_Log("Failed to load mesh \"%s\": %s", path, importer.GetErrorString());
+		return false;
+	}
+
+	std::vector<glm::vec3> positionData;
+
+	for(uint32 meshIndex=0; meshIndex<scene->mNumMeshes; ++meshIndex)
+	{
+		aiMesh* mesh = scene->mMeshes[meshIndex];
+		positionData.resize(mesh->mNumVertices);
+		memcpy(&positionData[0], mesh->mVertices, sizeof(glm::vec3) * mesh->mNumVertices);
+	}
+
 	GLuint vao, vbo;
 	glGenVertexArrays(1, &vao);
 	glGenBuffers(1, &vbo);
@@ -19,7 +40,7 @@ bool MeshResource::Load(const char* path)
 		glBindVertexArray(vao);
 
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * positionData.size(), &positionData[0], GL_STATIC_DRAW);
 
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
@@ -29,7 +50,7 @@ bool MeshResource::Load(const char* path)
 
 	m_VAO = vao;
 	m_DrawMode = GL_TRIANGLES;
-	m_DrawCount = 3;
+	m_DrawCount = positionData.size();
 	m_Elements = false;
 
 	return Resource::Load(path);

@@ -57,7 +57,8 @@ VAR_SPEC(void*);
 template<typename... TArgs>
 void ScriptFunction::Call(TArgs... args)
 {
-	if (!Ensure(IsValid()))
+	// Invalid script is fine, just return
+	if (!IsValid())
 		return;
 
 	PrepareContext();
