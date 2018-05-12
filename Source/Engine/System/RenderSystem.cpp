@@ -1,8 +1,14 @@
 #include "CorePCH.h"
 #include "RenderSystem.h"
 #include "Core/World/World.h"
+#include "Core/Context/Context.h"
+#include "Core/Rendering/Pipeline/RenderPipeline.h"
 #include "Engine/Component/CameraComponent.h"
 
+using namespace Rendering;
+
+/**	Run Begin
+*******************************************************************************/
 void RenderSystem::RunBegin()
 {
 	m_RenderSingleton = GetWorld()->GetSingletonComponent<RenderSingletonComponent>();
@@ -17,37 +23,107 @@ void RenderSystem::RunBegin()
 		}
 	}
 
-	glEnable(GL_DEPTH_TEST);
+	UpdateCameraMatrices();
+	m_RenderSingleton->m_CurrentManifest.RenderList.clear();
 
 	// Clear screen
+	glEnable(GL_DEPTH_TEST);
+
 	glClearColor(0.1f, 0.1f, 0.1f, 1.f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
+/**	Run Internal
+*******************************************************************************/
 void RenderSystem::RunInternal(Entity* entity, const TransformComponent* transform, const RenderableComponent* renderable)
 {
 	MeshResource* mesh = renderable->m_Mesh;
-	if (!mesh)
+	MaterialResource* material = renderable->m_Material;
+
+	if (!mesh || !material)
 		return;
 
-	glBindVertexArray(mesh->GetVAO());
-	glUseProgram(renderable->m_ShaderProgram);
+	RenderableData data;
+	data.Mesh = mesh->GetData();
+	data.Material = material->GetData();
 
-	GLuint u_Camera = glGetUniformLocation(renderable->m_ShaderProgram, "u_Camera");
-	glUniformMatrix4fv(u_Camera, 1, false, glm::value_ptr(m_RenderSingleton->m_CurrentCamera->m_CameraMatrix));
+	data.ModelMatrix = transform->GetMatrix();
+	data.ModelMatrixInv = inverse(transform->GetMatrix());
+	data.NormalMatrix = transform->GetNormalMatrix();
 
-	GLuint u_Model = glGetUniformLocation(renderable->m_ShaderProgram, "u_Model");
-	glUniformMatrix4fv(u_Model, 1, false, glm::value_ptr(transform->GetMatrix()));
-
-	if (mesh->GetUsingElements())
-		glDrawElements(mesh->GetDrawMode(), mesh->GetDrawCount(), GL_UNSIGNED_INT, nullptr);
-	else
-		glDrawArrays(mesh->GetDrawMode(), 0, mesh->GetDrawCount());
-
-	glBindVertexArray(0);
+	m_RenderSingleton->m_CurrentManifest.RenderList.push_back(data);
 }
 
+/**	Run End
+*******************************************************************************/
 void RenderSystem::RunEnd()
 {
+	IRenderPipeline* pipeline = IRenderPipeline::Get();
+	pipeline->Render(m_RenderSingleton->m_CurrentManifest);
+}
 
+/**	Update Camera Matrices
+*******************************************************************************/
+void RenderSystem::UpdateCameraMatrices()
+{
+	using namespace glm;
+	RenderManifest& manifest = m_RenderSingleton->m_CurrentManifest;
+	CameraComponent* camera = m_RenderSingleton->m_CurrentCamera;
+	TransformComponent* transform = camera->GetEntity()->GetComponent<TransformComponent>();
+
+	if (!Ensure(transform))
+		return;
+
+	//--------------------------------------------------- View matrix
+	{
+		// Get matrix from rotation
+		quat rotation = transform->GetRotation();
+		mat4 result = toMat4(rotation);
+
+		// In this engine, X-axis is forward and Z-axis is right
+		// So we have to swap X and Z, and also inverse Z to correspond to NDC
+		vec3 f(result[0]),
+			u(result[1]),
+			r(result[2]);
+
+		// Eye offset
+		vec3 pos = transform->GetPosition();
+		result = mat4(
+			r.x, u.x, -f.x, 0.f,
+			r.y, u.y, -f.y, 0.f,
+			r.z, u.z, -f.z, 0.f,
+			-dot(pos, r), -dot(pos, u), dot(pos, f), 1.f
+		);
+
+		//result = glm::lookAt(pos, vec3(), vec3(0.f, 1.f, 0.f));
+
+		// Done!
+		camera->m_ViewMatrix = result;
+	}
+
+	//--------------------------------------------------- Projection matrix
+	{
+		float ratio = (float)Context::GetInstance()->width / (float)Context::GetInstance()->height;
+
+		if (camera->m_Perspective)
+		{
+			camera->m_ProjectionMatrix = glm::perspective(radians(camera->m_FieldOfView), ratio, camera->m_Near, camera->m_Far);
+		}
+		else
+		{
+			float height = camera->m_OrthoHeight;
+			camera->m_ProjectionMatrix = glm::ortho(-ratio * height, ratio * height, -height, height, camera->m_Near, camera->m_Far);
+		}
+	}
+
+	// Combine into camera matrix
+	camera->m_CameraMatrix = camera->m_ProjectionMatrix * camera->m_ViewMatrix;
+
+	// Fill out render manifest
+	manifest.ProjectionMatrix = camera->m_ProjectionMatrix;
+	manifest.ProjectionMatrixInv = inverse(camera->m_ProjectionMatrix);
+	manifest.ViewMatrix = camera->m_ViewMatrix;
+	manifest.ViewMatrixInv = inverse(camera->m_ViewMatrix);
+	manifest.CameraMatrix = camera->m_CameraMatrix;
+	manifest.CameraMatrixInv = inverse(camera->m_CameraMatrix);
 }

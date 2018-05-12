@@ -1,5 +1,6 @@
 #pragma once
 #include "Resource.h"
+#include "Core/Rendering/RenderData.h"
 
 class MeshResource : public Resource
 {
@@ -9,16 +10,11 @@ public:
 	bool Load(const char* path) override;
 	void Release() override;
 
-	GLuint GetVAO() const { return m_VAO; }
-	uint32 GetDrawCount() const { return m_DrawCount; }
-	GLenum GetDrawMode() const { return m_DrawMode; }
-	bool GetUsingElements() const { return m_Elements; }
+	const Rendering::MeshData& GetData() const { return m_Data; }
 
 private:
-	GLuint m_VAO;
-	uint32 m_DrawCount;
-	GLenum m_DrawMode;
-	bool m_Elements;
+	Rendering::MeshData m_Data;
+	GLuint m_Buffers[3];
 };
 
 #include "Core/Serialize/NamedArchive.h"

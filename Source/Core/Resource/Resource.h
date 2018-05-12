@@ -1,10 +1,17 @@
 #pragma once
-#include "Core/Delegate/DelegateDispatcher.h"
+#include "Core/Delegate/Delegate.h"
 
 class ResourceManager;
 
 class Resource
 {
+private:
+	struct FFileDependency
+	{
+		std::string Path;
+		time_t LastModifiedTime;
+	};
+
 public:
 	typedef Hash::Type guid_t;
 
@@ -20,18 +27,22 @@ public:
 	const char* GetPath() const { return m_Path.c_str(); }
 	const guid_t& GetHash() const { return m_Hash; }
 
-	time_t GetModifiedTime() const;
-	bool HasChanged();
+	bool ShouldReload();
 
 	bool Equals(const Resource* other) const;
 
-	DelegateDispatcher<void, Resource*> m_OnHotReloaded;
-	DelegateDispatcher<void, Resource*> m_OnReleased;
+	Delegate<void, Resource*> m_OnHotReloaded;
+	Delegate<void, Resource*> m_OnReleased;
+
+protected:
+	void AddFileDependency(const std::string& path);
 
 private:
 	ResourceManager* const m_Manager;
 	std::string m_Path;
 	const guid_t m_Hash;
+
+	std::vector<FFileDependency> m_FileDependencies;
 
 	time_t m_ModifiedTime;
 };

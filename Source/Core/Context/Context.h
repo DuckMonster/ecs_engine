@@ -1,5 +1,6 @@
 #pragma once
 #include "Core/Utils/SingletonClass.h"
+#include "Core/Delegate/Delegate.h"
 
 class Context : public SingletonClass<Context>
 {
@@ -8,4 +9,7 @@ public:
 	int y;
 	int width;
 	int height;
+
+	Delegate<void, int, int> OnWindowMoved;
+	Delegate<void, int, int> OnResized;
 };

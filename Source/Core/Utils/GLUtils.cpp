@@ -4,7 +4,7 @@
 #include "GLUtils.h"
 #include <SOIL/SOIL.h>
 #include <fstream>
-#include "Material.h"
+#include "Core/Resource/MaterialResource.h"
 
 using namespace std;
 
@@ -162,7 +162,7 @@ namespace
 		"}";
 }
 
-void GLUtils::RenderTexture( GLuint texture )
+void GLUtils::RenderTexture( GLuint texture, MaterialResource* material/* = nullptr*/ )
 {
 	static GLuint QuadShader;
 	static bool ShaderCompiled = false;
@@ -173,7 +173,11 @@ void GLUtils::RenderTexture( GLuint texture )
 		ShaderCompiled = true;
 	}
 
-	glUseProgram( QuadShader );
+	if (material)
+		glUseProgram(material->GetData().ShaderHandle);
+	else
+		glUseProgram( QuadShader );
+
 	glDisable( GL_DEPTH_TEST );
 	glBindTexture( GL_TEXTURE_2D, texture );
 	glDrawArrays( GL_QUADS, 0, 4 );

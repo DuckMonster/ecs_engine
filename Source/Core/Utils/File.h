@@ -12,7 +12,7 @@ namespace File
 		struct stat result;
 		if (stat(filePath.c_str(), &result) == 0)
 		{
-			return result.st_atime;
+			return result.st_mtime;
 		}
 		else
 		{

@@ -26,6 +26,7 @@ public:
 	glm::vec3 GetRight() const;
 
 	glm::mat4 GetMatrix() const;
+	glm::mat4 GetNormalMatrix() const;
 
 private:
 	PROPERTY(Serialize)

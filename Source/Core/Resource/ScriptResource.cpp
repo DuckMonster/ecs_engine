@@ -11,7 +11,7 @@ namespace
 	std::string GetModuleNameFromPath(const char* path)
 	{
 		int start = 0;
-		int end = -1;
+		size_t end = -1;
 
 		for (int i = 0; i < strlen(path); ++i)
 		{
@@ -67,6 +67,7 @@ void ScriptResource::Release()
 	engine->DiscardModule(m_Module->GetName());
 
 	m_Module = nullptr;
+	Resource::Release();
 }
 
 /**	Get Function

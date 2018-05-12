@@ -8,7 +8,7 @@
 void CMaterial::Set(const char* uniform, const type* value, uint32 count) \
 { \
 	glUseProgram(m_Program); \
-	GLuint handle = glGetUniformLocation(m_Program, uniform); \
+	GLint handle = glGetUniformLocation(m_Program, uniform); \
 	\
 	if ( !EnsureMsg(handle != GLuint(-1), "Uniform \"%s\" wasn't found", uniform) ) \
 		return; \
@@ -20,7 +20,7 @@ void CMaterial::Set(const char* uniform, const type* value, uint32 count) \
 void CMaterial::Set(const char* uniform, const type* value, uint32 count) \
 { \
 	glUseProgram(m_Program); \
-	GLuint handle = glGetUniformLocation(m_Program, uniform); \
+	GLint handle = glGetUniformLocation(m_Program, uniform); \
 	\
 	if ( !EnsureMsg(handle != GLuint(-1), "Uniform \"%s\" wasn't found", uniform) ) \
 		return; \

@@ -8,6 +8,7 @@
 class Resource;
 class MeshResource;
 class ScriptResource;
+class MaterialResource;
 
 class ResourceManager : public SingletonClass<ResourceManager>
 {
@@ -15,6 +16,7 @@ public:
 	Resource* Load(const char* path);
 	MeshResource* LoadMesh(const char* path);
 	ScriptResource* LoadScript(const char* path);
+	MaterialResource* LoadMaterial(const char* path);
 	void Release(Resource* resource);
 
 	void UpdateResourceHotReloading();

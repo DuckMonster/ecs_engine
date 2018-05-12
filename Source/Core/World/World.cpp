@@ -118,7 +118,6 @@ void World::DestroyEntity(entity_id id)
 
 /**	Map Resource Reloaded
 *******************************************************************************/
-void MapResourceReloadedHandler(World* world, Resource* resource) { world->MapResourceReloaded(resource); }
 void World::MapResourceReloaded(Resource* resource)
 {
 	Debug_Log("World::MapResourceReloaded");
@@ -133,7 +132,7 @@ void World::LoadMap(const char* path)
 		return;
 
 	m_MapResource = ResourceManager::GetInstance()->Load(path);
-	m_MapResource->m_OnHotReloaded.Bind(this, MapResourceReloadedHandler);
+	m_MapResource->m_OnHotReloaded.BindObject(this, &World::MapResourceReloaded);
 
 	LoadFromResource();
 }

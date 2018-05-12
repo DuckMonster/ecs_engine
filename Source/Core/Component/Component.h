@@ -31,6 +31,8 @@ public:
 		return INVALID_TYPE;
 	}
 
+	Entity* GetEntity() const { return m_Entity; }
+
 	void DebugPrint();
 	virtual void Serialize(NamedArchive& archive);
 	virtual void OnSerialized() {}

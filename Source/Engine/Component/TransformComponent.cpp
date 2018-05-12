@@ -43,3 +43,9 @@ glm::mat4 TransformComponent::GetMatrix() const
 
 	return m_LocalMatrix;
 }
+
+glm::mat4 TransformComponent::GetNormalMatrix() const
+{
+	glm::mat4 matrix = GetMatrix();
+	return transpose(inverse(matrix));
+}

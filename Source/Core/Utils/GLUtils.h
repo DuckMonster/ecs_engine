@@ -1,5 +1,8 @@
 #pragma once
 #ifndef GAME_HEADLESS
+
+class MaterialResource;
+
 namespace GLUtils
 {
 	bool ReadFile( const char* filePath, std::string& outString );
@@ -42,6 +45,6 @@ namespace GLUtils
 
 	bool CreateTextureFromFile( const char* path, GLuint& outHandle );
 
-	void RenderTexture( GLuint texture );
+	void RenderTexture( GLuint texture, MaterialResource* material = nullptr );
 }
 #endif

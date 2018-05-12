@@ -1,8 +1,12 @@
 #version 330 core
-in vec3 f_Position;
-out vec4 o_Color;
+in vec3 f_World;
+in vec3 f_Normal;
+
+layout(location = 0) out vec3 o_Color;
+layout(location = 1) out vec3 o_Normal;
 
 void main()
 {
-	o_Color = vec4(f_Position, 1.0);
+	o_Color = f_World;
+	o_Normal = f_Normal;
 }

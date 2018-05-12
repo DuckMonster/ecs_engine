@@ -12,10 +12,33 @@ void HandleKeyEvent(GLFWwindow* window, int key, int scancode, int action, int m
 		glfwDestroyWindow(window);
 }
 
+void HandleWindowResizeEvent(GLFWwindow* window, int width, int height)
+{
+	Context* context = (Context*)glfwGetWindowUserPointer(window);
+	context->width = width;
+	context->height = height;
+	context->OnResized.Broadcast(width, height);
+}
+
+void HandleWindowMoveEvent(GLFWwindow* window, int x, int y)
+{
+	Context* context = (Context*)glfwGetWindowUserPointer(window);
+	context->x = x;
+	context->y = y;
+	context->OnWindowMoved.Broadcast(x, y);
+}
+
 void DoFrame(Program* program);
 
 int main(int argv, char** argc)
 {
+	bool alwaysOnTop = false;
+	for(int i=0; i<argv; ++i)
+	{
+		if (strcmp(argc[i], "top") == 0)
+			alwaysOnTop = true;
+	}
+
 	//--------------------------------------------------- Create and init window
 	GLFWwindow* window;
 
@@ -25,7 +48,10 @@ int main(int argv, char** argc)
 	// Window hints
 	glfwWindowHint(GLFW_RESIZABLE, 0);
 
-	window = glfwCreateWindow(1024, 768, "Hello World!", NULL, NULL);
+	if (alwaysOnTop)
+		glfwWindowHint(GLFW_FLOATING, 1);
+
+	window = glfwCreateWindow(1024, 768, "ECS Engine", NULL, NULL);
 	if (!Ensure(window))
 	{
 		glfwTerminate();
@@ -33,6 +59,8 @@ int main(int argv, char** argc)
 	}
 
 	glfwSetKeyCallback(window, HandleKeyEvent);
+	glfwSetWindowPosCallback(window, HandleWindowMoveEvent);
+	glfwSetWindowSizeCallback(window, HandleWindowResizeEvent);
 
 	glfwMakeContextCurrent(window);
 	glfwSwapInterval(0);
@@ -43,6 +71,7 @@ int main(int argv, char** argc)
 	context->height = 768;
 	glfwGetWindowPos(window, &context->width, &context->height);
 	glfwGetFramebufferSize(window, &context->width, &context->height);
+	glfwSetWindowUserPointer(window, context);
 
 	//--------------------------------------------------- Main loop
 	Program program;

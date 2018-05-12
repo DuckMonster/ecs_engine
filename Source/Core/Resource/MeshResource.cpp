@@ -8,12 +8,6 @@
 *******************************************************************************/
 bool MeshResource::Load(const char* path)
 {
-	float data[] {
-		-0.5f, -0.5f, 0.f,
-		0.5f, -0.5f, 0.f,
-		0.f, 0.5f, 0.f
-	};
-
 	Assimp::Importer importer;
 	const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate);
 
@@ -23,35 +17,61 @@ bool MeshResource::Load(const char* path)
 		return false;
 	}
 
+	uint32 numVerts = 0;
 	std::vector<glm::vec3> positionData;
+	std::vector<glm::vec3> normalData;
+	std::vector<glm::vec2> uvData;
 
 	for(uint32 meshIndex=0; meshIndex<scene->mNumMeshes; ++meshIndex)
 	{
 		aiMesh* mesh = scene->mMeshes[meshIndex];
-		positionData.resize(mesh->mNumVertices);
-		memcpy(&positionData[0], mesh->mVertices, sizeof(glm::vec3) * mesh->mNumVertices);
+
+		GLuint meshVerts = mesh->mNumVertices;
+		positionData.resize(numVerts + meshVerts);
+		normalData.resize(numVerts + meshVerts);
+		uvData.resize(numVerts + meshVerts);
+
+		memcpy(&positionData[numVerts], mesh->mVertices, sizeof(glm::vec3) * meshVerts);
+		
+		if (mesh->HasNormals())
+			memcpy(&normalData[numVerts], mesh->mNormals, sizeof(glm::vec3) * meshVerts);
+
+		if (mesh->HasTextureCoords(0))
+			memcpy(&uvData[numVerts], mesh->mTextureCoords[0], sizeof(glm::vec2) * meshVerts);
+
+		numVerts += meshVerts;
 	}
 
-	GLuint vao, vbo;
-	glGenVertexArrays(1, &vao);
-	glGenBuffers(1, &vbo);
+	glGenVertexArrays(1, &m_Data.VertexObject);
+	glGenBuffers(3, m_Buffers);
 
 	{
-		glBindVertexArray(vao);
+		glBindVertexArray(m_Data.VertexObject);
 
-		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * positionData.size(), &positionData[0], GL_STATIC_DRAW);
-
+		// Upload position
+		glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[0]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * numVerts, &positionData[0], GL_STATIC_DRAW);
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
+
+		// Upload normals
+		glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[1]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * numVerts, &normalData[0], GL_STATIC_DRAW);
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(1, 3, GL_FLOAT, false, 0, 0);
+
+		// Upload UV
+		glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[2]);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * numVerts, &uvData[0], GL_STATIC_DRAW);
+		glEnableVertexAttribArray(2);
+		glVertexAttribPointer(2, 2, GL_FLOAT, false, 0, 0);
 
 		glBindVertexArray(0);
 	}
 
-	m_VAO = vao;
-	m_DrawMode = GL_TRIANGLES;
-	m_DrawCount = positionData.size();
-	m_Elements = false;
+	m_Data.DrawMode = GL_TRIANGLES;
+	m_Data.DrawCount = positionData.size();
+	m_Data.UseElements = false;
 
 	return Resource::Load(path);
 }
@@ -60,7 +80,10 @@ bool MeshResource::Load(const char* path)
 *******************************************************************************/
 void MeshResource::Release()
 {
-	glDeleteVertexArrays(1, &m_VAO);
+	glDeleteVertexArrays(1, &m_Data.VertexObject);
+	glDeleteBuffers(3, m_Buffers);
+
+	Resource::Release();
 }
 
 #include "ResourceManager.h"

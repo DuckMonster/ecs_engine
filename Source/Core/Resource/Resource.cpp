@@ -21,8 +21,7 @@ Resource::~Resource()
 bool Resource::Load(const char* path)
 {
 	m_Path = path;
-	m_ModifiedTime = GetModifiedTime();
-
+	AddFileDependency(path);
 	return true;
 }
 
@@ -31,6 +30,7 @@ bool Resource::Load(const char* path)
 void Resource::Release()
 {
 	m_OnReleased.Broadcast(this);
+	m_FileDependencies.clear();
 }
 
 /**	Hot Reload
@@ -42,25 +42,18 @@ void Resource::HotReload()
 	m_OnHotReloaded.Broadcast(this);
 }
 
-/**	Get Modified Time
-*******************************************************************************/
-time_t Resource::GetModifiedTime() const
-{
-	if (!File::GetFileExists(m_Path))
-		return m_ModifiedTime;
-
-	time_t time = File::GetFileModifiedTime(m_Path);
-	return time != 0 ? time : m_ModifiedTime;
-}
-
 /**	Has Changed
 *******************************************************************************/
-bool Resource::HasChanged()
+bool Resource::ShouldReload()
 {
-	time_t oldTime = m_ModifiedTime;
-	m_ModifiedTime = GetModifiedTime();
+	for(FFileDependency& dependency : m_FileDependencies)
+	{
+		time_t modTime = File::GetFileModifiedTime(dependency.Path);
+		if (modTime > dependency.LastModifiedTime)
+			return true;
+	}
 
-	return oldTime < m_ModifiedTime;
+	return false;
 }
 
 /**	Equals
@@ -78,6 +71,17 @@ bool Resource::Equals(const Resource* other) const
 #endif
 
 	return isEquals;
+}
+
+/**	Add File Dependency
+*******************************************************************************/
+void Resource::AddFileDependency( const std::string& path )
+{
+	FFileDependency dependency;
+	dependency.Path = path;
+	dependency.LastModifiedTime = File::GetFileModifiedTime(path);
+
+	m_FileDependencies.push_back(dependency);
 }
 
 #include "ResourceManager.h"

@@ -14,5 +14,7 @@ protected:
 	void RunEnd() override;
 
 private:
+	void UpdateCameraMatrices();
+
 	RenderSingletonComponent* m_RenderSingleton = nullptr;
 };

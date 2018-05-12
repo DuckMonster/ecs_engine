@@ -3,9 +3,9 @@
 
 #include "MeshResource.h"
 #include "ScriptResource.h"
+#include "MaterialResource.h"
 #include "Core/Utils/File.h"
 #include "Core/Utils/Time.h"
-
 
 /**	Load
 *******************************************************************************/
@@ -26,6 +26,13 @@ MeshResource* ResourceManager::LoadMesh(const char* path)
 ScriptResource* ResourceManager::LoadScript(const char* path)
 {
 	return GetOrCreateResource<ScriptResource>(path);
+}
+
+/**	Load Material
+*******************************************************************************/
+MaterialResource* ResourceManager::LoadMaterial( const char* path )
+{
+	return GetOrCreateResource<MaterialResource>(path);
 }
 
 /**	Release
@@ -68,7 +75,7 @@ void ResourceManager::UpdateResourceHotReloading()
 
 		for (Resource* res : m_HotloadResources)
 		{
-			if (res->HasChanged())
+			if (res->ShouldReload())
 				resourcesToReload.push_back(res);
 		}
 

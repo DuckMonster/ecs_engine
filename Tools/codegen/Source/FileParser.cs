@@ -77,8 +77,6 @@ namespace CodeGenerator
 
 			CurrentFile = file;
 
-			Utils.PrintVerbal("\n-------------- Parsing \"{0}\" ------------------\n", file.FileName);
-
 			// ----------------------------- Collect Components
 			MatchCollection match = COMP_RGX.Matches(file.Source);
 			if (match.Count > 0)
@@ -138,7 +136,7 @@ namespace CodeGenerator
 					comp.Properties = compProperties;
 				}
 
-				Utils.PrintVerbal("Parsed component \"{0}\"...", comp.Name);
+				Utils.PrintVerbal("({0}) Parsed component \"{1}\"...", file.FileName, comp.Name);
 				manifest.Components.Add(comp);
 			}
 
@@ -177,7 +175,7 @@ namespace CodeGenerator
 					database.RegisterFunction = regFunction;
 				}
 
-				Utils.PrintVerbal("Parsed database \"{0}\"...", database.ClassName);
+				Utils.PrintVerbal("({0}) Parsed database \"{1}\"...", file.FileName, database.ClassName);
 				manifest.Database = database;
 			}
 		}

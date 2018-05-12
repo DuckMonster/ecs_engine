@@ -4,5 +4,4 @@
 
 RenderableComponent::RenderableComponent(Entity* entity) : Component(entity)
 {
-	m_ShaderProgram = GLUtils::CreateShaderFromFile("Resource/Shader/test");
 }
