@@ -1,0 +1,17 @@
+* Implement forward rendering
+
+* Directory stack and recursive file loading (resource dependency and relative paths)
+
+* Implement headless
+
+* Input management
+
+* Program argument parser class?
+
+* Move testing from a configuration to a program argument
+
+* Implement light structures into rendering pipeline (right now they're hardcoded in the Deferred pipeline)
+
+* Clean up serializing of resources (having overloads in the header is _ugly_)
+
+* Uniform parameter overloading in mesh renderers
