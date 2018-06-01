@@ -7,6 +7,6 @@ layout(location = 1) out vec3 o_Normal;
 
 void main()
 {
-	o_Color = f_World;
+	o_Color = vec3(1.0, 0.0, 0.0);
 	o_Normal = f_Normal;
 }

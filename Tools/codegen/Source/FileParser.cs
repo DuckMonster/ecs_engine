@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -59,28 +60,18 @@ namespace CodeGenerator
 			file.FileName = Path.GetFileName(sourcePath);
 			file.FullPath = sourcePath;
 			file.Source = File.ReadAllText(sourcePath).Replace("\r", "");
-			file.ModifyTime = File.GetLastWriteTime(sourcePath);
-
-			// Check if the source file has not been modified since last generation
-			//if (!CodeGen.GenData.CanGenerate && File.Exists(file.GenSourcePath()) && File.Exists(file.GenHeaderPath()))
-			//{
-			//	DateTime SourceDate = File.GetLastWriteTime(sourcePath),
-			//		TargetSourceDate = File.GetLastWriteTime(file.GenSourcePath()),
-			//		TargetHeaderDate = File.GetLastWriteTime(file.GenHeaderPath());
-
-			//	if (SourceDate < TargetSourceDate && SourceDate < TargetHeaderDate)
-			//	{
-			//		Utils.Print("Skipping \"{0}\"...", file.FileName);
-			//		return;
-			//	}
-			//}
+			file.IsDirty = false;
 
 			CurrentFile = file;
+
+			bool fileShouldBeGenerated = false;
 
 			// ----------------------------- Collect Components
 			MatchCollection match = COMP_RGX.Matches(file.Source);
 			if (match.Count > 0)
 			{
+				fileShouldBeGenerated = true;
+
 				string[] namespaces = Utils.FindNamespaces(file.Source, match[0].Index);
 				string[] metadata = ParseMetadata(match[0].Groups[1].Value);
 
@@ -144,6 +135,8 @@ namespace CodeGenerator
 			match = TYPE_DB_RGX.Matches(file.Source);
 			if (match.Count > 0)
 			{
+				fileShouldBeGenerated = true;
+
 				TypeDatabase database = new TypeDatabase();
 				database.File = file;
 				database.ClassName = match[0].Groups[2].Value;
@@ -178,6 +171,9 @@ namespace CodeGenerator
 				Utils.PrintVerbal("({0}) Parsed database \"{1}\"...", file.FileName, database.ClassName);
 				manifest.Database = database;
 			}
+
+			if (fileShouldBeGenerated)
+				file.IsDirty = GetFileIsDirty(file);
 		}
 
 		public static Parameter[] ParseParameters(string src)
@@ -220,6 +216,24 @@ namespace CodeGenerator
 				return name.Substring(2);
 			else
 				return name;
+		}
+
+		static bool GetFileIsDirty(SourceFile file)
+		{
+			if (CodeGen.GenData.CanGenerate)
+				return true;
+
+			if (File.Exists(file.GenSourcePath) && File.Exists(file.GenHeaderPath))
+			{
+				// Check time modified
+				DateTime SourceDate = File.GetLastWriteTime(file.FullPath),
+					TargetSourceDate = File.GetLastWriteTime(file.GenSourcePath),
+					TargetHeaderDate = File.GetLastWriteTime(file.GenHeaderPath);
+
+				return (SourceDate > TargetSourceDate || SourceDate > TargetHeaderDate);
+			}
+			// The generated files dont exist, it's dirty
+			else return true;
 		}
 	}
 }

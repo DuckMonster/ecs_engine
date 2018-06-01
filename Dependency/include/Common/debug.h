@@ -114,10 +114,10 @@ namespace Debug
 	{
 		if ( !expr )
 		{
-			ConsoleLog( file, line, "ENSURE: %s", exprStr );
-
 			if ( CheckEnsureOnce( file, line, exprStr ) )
 			{
+				ConsoleLog( file, line, "ENSURE: %s", exprStr );
+
 				if ( IsDebuggerPresent() )
 					DebugBreak();
 				else
@@ -143,10 +143,10 @@ namespace Debug
 			vsprintf_s( sBuffer, DEBUG_BUF_SIZE, msgFormat, vl );
 			va_end( vl );
 
-			ConsoleLog( file, line, "ENSURE: %s || %s", exprStr, sBuffer );
-
 			if ( CheckEnsureOnce( file, line, exprStr ) )
 			{
+				ConsoleLog( file, line, "ENSURE: %s || %s", exprStr, sBuffer );
+
 				if ( IsDebuggerPresent() )
 					DebugBreak();
 				else

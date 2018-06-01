@@ -3,6 +3,11 @@
 #include <chrono>
 #include "Core/Context/Context.h"
 #include "Core/Program/Program.h"
+#include "Core/Utils/File.h"
+
+// Used to get working directory
+#include <direct.h>
+#define GetCurrentDir _getcwd
 
 void HandleKeyEvent(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
@@ -32,6 +37,13 @@ void DoFrame(Program* program);
 
 int main(int argv, char** argc)
 {
+	// Push launch directory into directory stack
+	char currentDirBuffer[512];
+	GetCurrentDir(currentDirBuffer, 512);
+
+	File::DirectoryScope scope(currentDirBuffer);
+	//
+
 	bool alwaysOnTop = false;
 	for(int i=0; i<argv; ++i)
 	{

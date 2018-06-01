@@ -2,10 +2,29 @@
 	"name": "My Testmap",
 	"camera": "Camera",
 
-	"entities": [
+	"entities": 
+	[
+		{
+			"name": "Ground",
+			"components": 
+			[
+				{
+					"type": "TransformComponent",
+					"Position": [ 0.0, -0.5, 0.0 ],
+					"Rotation": [ 0.0, 0.0, 0.0 ],
+					"Scale": [ 20.0, 20.0, 20.0 ]
+				},
+				{
+					"type": "RenderableComponent",
+					"Mesh": "Resource/Mesh/plane.fbx",
+					"Material": "Resource/Material/testmaterial.json"
+				}
+			]
+		},
 		{
 			"name": "DonutEntity",
-			"components": [
+			"components": 
+			[
 				{
 					"type": "TransformComponent",
 					"Position": [ 0.0, 2.0, 0.0 ],
@@ -19,9 +38,10 @@
 				}
 			]
 		},
-			{
+		{
 			"name": "PlayerEntity",
-			"components": [
+			"components": 
+			[
 				{
 					"type": "TransformComponent",
 					"Position": [ 0.5, 0.0, 0.0 ],
@@ -37,7 +57,8 @@
 		},
 		{
 			"name": "OtherEntity",
-			"components": [
+			"components": 
+			[
 				{
 					"type": "TransformComponent",
 					"Position": [ -0.5, 0.0, 0.0 ],
@@ -53,7 +74,8 @@
 		},
 		{
 			"name": "ThirdEntity",
-			"components": [
+			"components": 
+			[
 				{
 					"type": "TransformComponent",
 					"Position": [ 0.0, 1.0, 0.0 ],
@@ -73,7 +95,8 @@
 		},
 		{
 			"name": "Camera",
-			"components": [
+			"components": 
+			[
 				{
 					"type": "TransformComponent",
 					"Position": [ 0.0, 0.0, 5.0 ],
@@ -81,9 +104,9 @@
 				},
 				{
 					"type": "CameraComponent",
-					"Far": 10.0,
+					"Far": 50.0,
 					"Near": 2.0,
-					"Perspective": true
+					"Perspective": false
 				},
 				{
 					"type": "BehaviourComponent",

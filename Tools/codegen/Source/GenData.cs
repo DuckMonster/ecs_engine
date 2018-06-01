@@ -12,33 +12,22 @@ namespace CodeGenerator
 		public string FileName;
 		public string FullPath;
 		public string Source;
-		public DateTime ModifyTime;
+		public bool IsDirty;
+
+		public string CacheFileName
+		{ get { return StripExtension() + ".cache"; } }
+		public string GenSrcFileName
+		{ get { return StripExtension() + ".gen.cpp"; } }
+		public string GenHeaderFileName
+		{ get { return StripExtension() + ".gen.h"; } }
+		public string GenSourcePath
+		{ get { return Path.Combine(CodeGen.GenData.TargetPath, GenSrcFileName); } }
+		public string GenHeaderPath
+		{ get { return Path.Combine(CodeGen.GenData.TargetPath, GenHeaderFileName); } }
 
 		public string StripExtension()
 		{
 			return Path.GetFileNameWithoutExtension(FileName);
-		}
-
-		public string GenSrcFileName()
-		{
-			string name = StripExtension();
-			return name + ".gen.cpp";
-		}
-
-		public string GenHeaderFileName()
-		{
-			string name = StripExtension();
-			return name + ".gen.h";
-		}
-
-		public string GenSourcePath()
-		{
-			return Path.Combine(CodeGen.GenData.TargetPath, GenSrcFileName());
-		}
-
-		public string GenHeaderPath()
-		{
-			return Path.Combine(CodeGen.GenData.TargetPath, GenHeaderFileName());
 		}
 	}
 

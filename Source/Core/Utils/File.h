@@ -2,10 +2,28 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
+#undef GetCurrentDirectory
+
 namespace File
 {
-	bool ReadFile(const char* filePath, std::string& outString);
+	struct DirectoryScope
+	{
+		DirectoryScope(const char* directory);
+		~DirectoryScope();
+	};
+
+	std::string GetCurrentDirectory();
+
+	void _TestFile();
+	
+	// Directory
+	bool IsDirectory(const char* path);
+	bool IsRootPath(const char* path);
+	std::string CleanPath(const char* path);
+	std::string RemoveFileFromPath(const char* path);
 	std::string GetFileFromPath(const std::string& fullPath);
+
+	bool ReadFile(const char* filePath, std::string& outString);
 
 	inline time_t GetFileModifiedTime(const std::string& filePath)
 	{

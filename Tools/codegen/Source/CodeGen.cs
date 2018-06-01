@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 
 namespace CodeGenerator
 {
@@ -10,6 +11,7 @@ namespace CodeGenerator
 	{
 		public string SourcePath;
 		public string TargetPath;
+		public string CachePath { get { return Path.Combine(TargetPath, "cache"); } }
 		public bool CanGenerate;
 		public bool Verbal;
 	}
@@ -54,7 +56,13 @@ namespace CodeGenerator
 			if (!Directory.Exists(GenData.TargetPath))
 			{
 				Directory.CreateDirectory(GenData.TargetPath);
-				Utils.PrintVerbal("Created directory \"{0}\"", GenData.TargetPath);
+				Utils.Print("Created directory \"{0}\"", GenData.TargetPath);
+			}
+
+			if (!Directory.Exists(GenData.CachePath))
+			{
+				Directory.CreateDirectory(GenData.CachePath);
+				Utils.Print("Created directory \"{0}\"", GenData.CachePath);
 			}
 
 			// Collect manifest
@@ -88,6 +96,9 @@ namespace CodeGenerator
 
 			foreach (Component comp in manifest.Components)
 			{
+				if (!comp.File.IsDirty)
+					continue;
+
 				// Source
 				using (FileStream fileStream = OpenSource(comp.File))
 				{
@@ -98,7 +109,7 @@ namespace CodeGenerator
 					writer.Flush();
 					writer.Close();
 
-					Utils.Print(comp.File.GenSrcFileName());
+					Utils.Print(comp.File.GenSrcFileName);
 				}
 
 				// Header
@@ -111,7 +122,7 @@ namespace CodeGenerator
 					writer.Flush();
 					writer.Close();
 
-					Utils.Print(comp.File.GenHeaderFileName());
+					Utils.Print(comp.File.GenHeaderFileName);
 				}
 			}
 
@@ -124,7 +135,7 @@ namespace CodeGenerator
 				writer.Flush();
 				writer.Close();
 
-				Utils.Print(manifest.Database.File.GenSrcFileName());
+				Utils.Print(manifest.Database.File.GenSrcFileName);
 			}
 
 			Utils.Print("-- GENERATION DONE --");
@@ -171,20 +182,20 @@ namespace CodeGenerator
 
 		static FileStream OpenSource(SourceFile file)
 		{
-			string genPath = Path.Combine(GenData.TargetPath, file.GenSrcFileName());
+			string genPath = Path.Combine(GenData.TargetPath, file.GenSrcFileName);
 
 			if (!GenData.CanGenerate && !File.Exists(genPath))
-				Error("", "File \"{0}\" doesn't exist, and CanGenerate is false. Remake the project.", file.GenSrcFileName());
+				Error("", "File \"{0}\" doesn't exist, and CanGenerate is false. Remake the project.", file.GenSrcFileName);
 
 			return new FileStream(genPath, FileMode.Create);
 		}
 
 		static FileStream OpenHeader(SourceFile file)
 		{
-			string genPath = Path.Combine(GenData.TargetPath, file.GenHeaderFileName());
+			string genPath = Path.Combine(GenData.TargetPath, file.GenHeaderFileName);
 
 			if (!GenData.CanGenerate && !File.Exists(genPath))
-				Error("", "File \"{0}\" doesn't exist, and CanGenerate is false. Remake the project.", file.GenHeaderFileName());
+				Error("", "File \"{0}\" doesn't exist, and CanGenerate is false. Remake the project.", file.GenHeaderFileName);
 
 			return new FileStream(genPath, FileMode.Create);
 		}
