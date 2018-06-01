@@ -1,6 +1,6 @@
 #pragma once
 #include "ComponentType.h"
-#include "Core/Utils/StringUtils.h"
+#include "Core/Tools/StringUtils.h"
 #include "PropertyUtils.h"
 
 class Entity;

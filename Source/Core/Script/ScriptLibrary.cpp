@@ -36,7 +36,7 @@ namespace
 }
 
 //--------------------------------------------------- Time
-#include "Core/Utils/Time.h"
+#include "Core/Tools/Time.h"
 namespace TimeFunc
 {
 	/**	Time::Elapsed

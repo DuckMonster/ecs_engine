@@ -1,5 +1,5 @@
 #pragma once
-#include "Core/Utils/SingletonClass.h"
+#include "Core/Tools/SingletonClass.h"
 
 class asIScriptEngine;
 

@@ -1,6 +1,6 @@
 #include "CorePCH.h"
 #include "MaterialResource.h"
-#include "Core/Utils/GLUtils.h"
+#include "Core/Tools/GLUtils.h"
 #include "ResourceManager.h"
 
 /**	Load

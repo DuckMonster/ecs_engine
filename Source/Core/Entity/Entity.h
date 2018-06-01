@@ -1,7 +1,7 @@
 #pragma once
 #include <type_traits>
 #include <tuple>
-#include "Core/Utils/Name.h"
+#include "Core/Tools/Name.h"
 #include "Core/Component/ComponentType.h"
 #include "EntityUtils.h"
 

@@ -18,5 +18,5 @@
 #include <glm/gtx/euler_angles.hpp>
 
 #include <Common/Debug.h>
-#include "Core/Utils/Types.h"
-#include "Core/Utils/Name.h"
+#include "Core/Tools/Types.h"
+#include "Core/Tools/Name.h"

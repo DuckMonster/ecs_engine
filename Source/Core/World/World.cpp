@@ -1,6 +1,6 @@
 #include "CorePCH.h"
 #include "World.h"
-#include "Core/Utils/GLUtils.h"
+#include "Core/Tools/GLUtils.h"
 #include "Core/Entity/Entity.h"
 #include "Core/System/System.h"
 #include "Core/Context/Context.h"

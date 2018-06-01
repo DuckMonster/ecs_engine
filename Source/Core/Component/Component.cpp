@@ -1,6 +1,6 @@
 #include "CorePCH.h"
 #include "Component.h"
-#include "Core/Utils/StringUtils.h"
+#include "Core/Tools/StringUtils.h"
 
 void Component::DebugPrint()
 {

@@ -1,6 +1,6 @@
 #include "CorePCH.h"
 #include "Deferred.h"
-#include "Core/Utils/GLUtils.h"
+#include "Core/Tools/GLUtils.h"
 #include "Core/Resource/MaterialResource.h"
 #include "Core/Resource/ResourceManager.h"
 #include "../ShaderHelper.h"

@@ -1,9 +1,9 @@
 #pragma once
 #include <unordered_map>
 #include "Common/hash.h"
-#include "Core/Utils/SingletonClass.h"
-#include "Core/Utils/Time.h"
-#include "Core/Utils/Timer.h"
+#include "Core/Tools/SingletonClass.h"
+#include "Core/Tools/Time.h"
+#include "Core/Tools/Timer.h"
 
 class Resource;
 class MeshResource;
