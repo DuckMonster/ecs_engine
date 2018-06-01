@@ -8,9 +8,12 @@ public:
 	FDirectory();
 	FDirectory(const char* path);
 
-	FDirectory operator+(const FDirectory& other);
-	FDirectory operator+(FDirectory&& other);
-	FDirectory operator+(const char* path);
+	FDirectory operator+(const FDirectory& other) const;
+	FDirectory operator+(FDirectory&& other) const;
+	FDirectory operator+(const char* path) const;
+	FDirectory& operator+=(const FDirectory& other);
+	FDirectory& operator+=(FDirectory&& other);
+	FDirectory& operator+=(const char* path);
 
 	FDirectory& operator=(const char* path);
 

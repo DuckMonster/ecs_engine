@@ -65,7 +65,7 @@ FDirectory::FDirectory( const char* path )
 
 /**	Add operator
 *******************************************************************************/
-FDirectory FDirectory::operator+( FDirectory&& other )
+FDirectory FDirectory::operator+( FDirectory&& other ) const
 {
 	FDirectory result;
 	std::string pathResult = m_Path + other.m_Path;
@@ -76,7 +76,7 @@ FDirectory FDirectory::operator+( FDirectory&& other )
 
 /**	Add operator
 *******************************************************************************/
-FDirectory FDirectory::operator+( const FDirectory& other )
+FDirectory FDirectory::operator+( const FDirectory& other ) const
 {
 	FDirectory result;
 	std::string pathResult = m_Path + other.m_Path;
@@ -87,9 +87,33 @@ FDirectory FDirectory::operator+( const FDirectory& other )
 
 /**	Add operator
 *******************************************************************************/
-FDirectory FDirectory::operator+( const char* path )
+FDirectory FDirectory::operator+( const char* path ) const
 {
 	return ( *this + FDirectory( path ) );
+}
+
+/**	AddEqual operator
+*******************************************************************************/
+FDirectory& FDirectory::operator+=( const FDirectory& other )
+{
+	m_Path += other.m_Path;
+	return *this;
+}
+
+/**	AddEqual operator
+*******************************************************************************/
+FDirectory& FDirectory::operator+=( FDirectory&& other )
+{
+	m_Path += other.m_Path;
+	return *this;
+}
+
+/**	AddEqual operator
+*******************************************************************************/
+FDirectory& FDirectory::operator+=( const char* path )
+{
+	*this += FDirectory(path);
+	return *this;
 }
 
 /**	Is Root
@@ -110,7 +134,7 @@ bool FDirectory::Exists() const
 		return false;
 	}
 
-	return info.st_mode & S_IFDIR != 0;
+	return (info.st_mode & S_IFDIR) != 0;
 }
 
 /**	Assignment with char ptr

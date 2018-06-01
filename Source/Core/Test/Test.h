@@ -1,9 +1,16 @@
 #pragma once
 
-#define DEFINE_TEST(name, test) \
+#define TEST_EXPR(expr) do {\
+bool result = !!(expr);\
+Debug_Log("%s%s", #expr, result ? "" : " (FAIL)");\
+if (!result)\
+	return false;\
+} while(0)\
+
+#define DEFINE_TEST(function) \
 namespace {\
-Test::TestDefinition name(#name, []() -> bool ## test ##);\
-}\
+Test::TestDefinition TEST_##function(#function, &function);\
+}
 
 class Test
 {
