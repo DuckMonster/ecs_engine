@@ -2,7 +2,7 @@
 workspace "ecs_engine"
 	location "Build/"
 	platforms { "x64" }
-	configurations { "Debug", "Release", "DebugServer", "ReleaseServer" }
+	configurations { "Debug", "Release", "DebugServer", "ReleaseServer", "Test" }
 	targetdir "Bin/%{prj.name}"
 	startproject "Game"
 
@@ -60,23 +60,26 @@ project "Game"
 		optimize "On"
 		libdirs "Dependency/lib/Release"
 
-	filter "Debug or DebugServer"
+	filter "Debug or DebugServer or Test"
 		defines { "_DEBUG", "DEBUG" }
 		symbols "On"
 		libdirs "Dependency/lib/Debug"
 		
-	filter "Debug"
+	filter "Debug or Test"
 		links { "glew32sd" }
 
 	filter "Release"
 		links { "glew32s" }
 
-	filter "Debug or Release"
+	filter "Debug or Release or Test"
 		defines { "GLEW_STATIC" }
 		links { "opengl32", "glfw3", "SOIL", "assimp.lib" }
 
 	filter "DebugServer or ReleaseServer"
 		defines { "GAME_HEADLESS" }
+
+	filter "Test"
+		defines { "TEST" }
 
 
 group "Tools"

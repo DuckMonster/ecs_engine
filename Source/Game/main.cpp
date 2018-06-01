@@ -3,11 +3,11 @@
 #include <chrono>
 #include "Core/Context/Context.h"
 #include "Core/Program/Program.h"
-#include "Core/Utils/File.h"
+#include "Core/Tools/File.h"
 
-// Used to get working directory
-#include <direct.h>
-#define GetCurrentDir _getcwd
+#ifdef TEST
+#include "Core/Test/Test.h"
+#endif
 
 void HandleKeyEvent(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
@@ -35,16 +35,18 @@ void HandleWindowMoveEvent(GLFWwindow* window, int x, int y)
 
 void DoFrame(Program* program);
 
+#ifdef TEST
+// If running in test config, just run tests and quit
 int main(int argv, char** argc)
 {
-	// Push launch directory into directory stack
-	char currentDirBuffer[512];
-	GetCurrentDir(currentDirBuffer, 512);
-
-	File::DirectoryScope scope(currentDirBuffer);
-	//
-
+	Test::Run();
+	return 0;
+}
+#else
+int main(int argv, char** argc)
+{
 	bool alwaysOnTop = false;
+
 	for(int i=0; i<argv; ++i)
 	{
 		if (strcmp(argc[i], "top") == 0)
@@ -98,6 +100,7 @@ int main(int argv, char** argc)
 
 	return 0;
 }	
+#endif
 
 void DoFrame(Program* program)
 {
