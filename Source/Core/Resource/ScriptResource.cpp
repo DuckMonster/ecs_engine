@@ -4,7 +4,7 @@
 #include "AngelScript/add_on/scriptbuilder/scriptbuilder.h"
 #include "Core/Script/ScriptEngine.h"
 #include "Core/Script/ScriptFunction.h"
-#include "Core/Tools/File.h"
+#include "Core/OS/File.h"
 
 namespace
 {

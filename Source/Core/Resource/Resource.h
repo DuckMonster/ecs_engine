@@ -1,5 +1,6 @@
 #pragma once
 #include "Core/Delegate/Delegate.h"
+#include "Core/OS/File.h"
 
 class ResourceManager;
 
@@ -8,7 +9,7 @@ class Resource
 private:
 	struct FFileDependency
 	{
-		std::string Path;
+		FFile File;
 		time_t LastModifiedTime;
 	};
 

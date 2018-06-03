@@ -3,7 +3,8 @@
 #include <chrono>
 #include "Core/Context/Context.h"
 #include "Core/Program/Program.h"
-#include "Core/Tools/File.h"
+#include "Core/OS/File.h"
+#include "Core/OS/Directory.h"
 
 #ifdef TEST
 #include "Core/Test/Test.h"
@@ -52,6 +53,9 @@ int main(int argv, char** argc)
 		if (strcmp(argc[i], "top") == 0)
 			alwaysOnTop = true;
 	}
+
+	// Set local root
+	FDirectory::SetLocalDirectory(FDirectory::GetWorkingDirectory());
 
 	//--------------------------------------------------- Create and init window
 	GLFWwindow* window;

@@ -1,6 +1,6 @@
 #include "CorePCH.h"
 #include "Resource.h"
-#include "Core/Tools/File.h"
+#include "Core/OS/File.h"
 
 /**	Constructor
 *******************************************************************************/
@@ -48,7 +48,7 @@ bool Resource::ShouldReload()
 {
 	for(FFileDependency& dependency : m_FileDependencies)
 	{
-		time_t modTime = File::GetFileModifiedTime(dependency.Path);
+		time_t modTime = dependency.File.GetModifiedTime();
 		if (modTime > dependency.LastModifiedTime)
 			return true;
 	}
@@ -78,8 +78,8 @@ bool Resource::Equals(const Resource* other) const
 void Resource::AddFileDependency( const std::string& path )
 {
 	FFileDependency dependency;
-	dependency.Path = path;
-	dependency.LastModifiedTime = File::GetFileModifiedTime(path);
+	dependency.File = path;
+	dependency.LastModifiedTime = dependency.File.GetModifiedTime();
 
 	m_FileDependencies.push_back(dependency);
 }

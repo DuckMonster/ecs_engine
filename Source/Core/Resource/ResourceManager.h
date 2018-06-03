@@ -36,7 +36,7 @@ private:
 template<typename TResource>
 TResource* ResourceManager::GetOrCreateResource(const char* path)
 {
-	if (!Ensure(File::GetFileExists(path)))
+	if (!Ensure(FFile(path).Exists()))
 		return nullptr;
 
 	Hash::Type hash = Hash::FNV(path, strlen(path));

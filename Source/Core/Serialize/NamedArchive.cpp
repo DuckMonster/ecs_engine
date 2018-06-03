@@ -1,6 +1,6 @@
 #include "CorePCH.h"
 #include "NamedArchive.h"
-#include "Core/Tools/File.h"
+#include "Core/OS/File.h"
 #include <rapidjson/error/en.h>
 
 using namespace rapidjson;
@@ -10,7 +10,9 @@ NamedArchive::Source NamedArchive::Open(const char* path)
 	Source source;
 
 	std::string jsonString;
-	if (!Ensure(File::ReadFile(path, jsonString)))
+	FFile sourceFile(path);
+
+	if (!sourceFile.ReadAll(jsonString))
 	{
 		Debug_Log("Failed to open json file \"%s\"", path);
 		return source;

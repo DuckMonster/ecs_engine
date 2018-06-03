@@ -1,6 +1,6 @@
 #include "CorePCH.h"
 #include "ScriptEngine.h"
-#include "Core/Tools/File.h"
+#include "Core/OS/File.h"
 #include <angelscript.h>
 #include "AngelScript/add_on/scriptstdstring/scriptstdstring.h"
 #include "AngelScript/add_on/scriptmath/scriptmath.h"
@@ -19,7 +19,7 @@ namespace
 		case asMSGTYPE_ERROR: type = "Error"; break;
 		}
 
-		std::string fileName = File::GetFileFromPath(msg->section);
+		std::string fileName = FFile::GetFileNameFromPath(msg->section);
 
 		Debug_Log_Minimal("(ANGELSCRIPT) %s: %s(%d, %d)> %s", type, fileName.c_str(), msg->row, msg->col, msg->message);
 	}

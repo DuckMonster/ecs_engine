@@ -1,5 +1,4 @@
 #pragma once
-
 #define TEST_EXPR(expr) do {\
 bool result = !!(expr);\
 Debug_Log("%s%s", #expr, result ? "" : " (FAIL)");\
