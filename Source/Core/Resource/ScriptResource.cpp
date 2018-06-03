@@ -35,9 +35,9 @@ namespace
 
 /**	Load
 *******************************************************************************/
-bool ScriptResource::Load(const char* path)
+bool ScriptResource::Load(const FFile& file)
 {
-	std::string moduleName = GetModuleNameFromPath(path);
+	std::string moduleName = GetModuleNameFromPath(file.GetPath());
 
 	CScriptBuilder builder;
 	asIScriptEngine* engine = ScriptEngine::GetInstance()->GetAngelScriptEngine();
@@ -45,7 +45,7 @@ bool ScriptResource::Load(const char* path)
 	if (!Ensure(builder.StartNewModule(engine, moduleName.c_str()) >= 0))
 		return false;
 
-	if (!Ensure(builder.AddSectionFromFile(path) >= 0))
+	if (!Ensure(builder.AddSectionFromFile(file.GetPath()) >= 0))
 		return false;
 
 	// It's OK if the module doesn't build properly, just move on
@@ -53,7 +53,7 @@ bool ScriptResource::Load(const char* path)
 	if (builder.BuildModule() <= 0)
 		m_Module = engine->GetModule(moduleName.c_str());
 
-	return Resource::Load(path);
+	return true;
 }
 
 /**	Release
@@ -92,6 +92,6 @@ bool NamedArchive::Serialize<ScriptResource*>(const char* name, ScriptResource*&
 	if (!Serialize(name, resourceName))
 		return false;
 
-	value = ResourceManager::GetInstance()->LoadScript(resourceName);
+	value = ResourceManager::GetInstance()->Load<ScriptResource>(resourceName);
 	return true;
 }

@@ -2,61 +2,121 @@
 #include "MaterialResource.h"
 #include "Core/Tools/GLUtils.h"
 #include "ResourceManager.h"
+#include "ShaderResource.h"
 
 /**	Load
 *******************************************************************************/
-bool MaterialResource::Load( const char* path )
+bool MaterialResource::Load( const FFile& file )
 {
-	Resource::Load(path);
+	ParseMaterialFile( file );
 
-	MaterialSerializedData data;
-	ParseMaterialFile(path, data);
-
-	//--------------------------------------------------- Find and compile shaders
-	if (data.vertexFile.empty())
+	if ( !m_VertexShader || !m_FragmentShader || !m_VertexShader->IsValid() || !m_FragmentShader->IsValid() )
 	{
-		Debug_Log("No vertex shader specified in material \"%s\"", path);
-		return true;
+		Debug_Log( "To create a material we need a vertex and fragment shader" );
+		return false;
 	}
 
-	if (data.fragmentFile.empty())
+	// Create and link program
+	GLuint program = glCreateProgram();
+	glAttachShader( program, m_VertexShader->GetShaderHandle() );
+	glAttachShader( program, m_FragmentShader->GetShaderHandle() );
+	glLinkProgram( program );
+
+	// Get success and show info
+	GLint isLinked = 0;
+	glGetProgramiv( program, GL_LINK_STATUS, &isLinked );
+
+	if ( isLinked == GL_FALSE )
 	{
-		Debug_Log("No fragment shader specified in material \"%s\"", path);
-		return true;
+		static char LogBuffer[1 << 11];
+		glGetProgramInfoLog( program, 1 << 11, nullptr, LogBuffer );
+		Debug_Log( "Material \"%s\" link failed:\n%s", file.GetFileName(), LogBuffer );
+		
+		Release();
+		return false;
 	}
 
-	m_Data.ShaderHandle = GLUtils::CreateShaderFromFiles(data.vertexFile.c_str(), data.fragmentFile.c_str());
-	AddFileDependency(data.vertexFile.c_str());
-	AddFileDependency(data.fragmentFile.c_str());
-
+	m_Data.ShaderHandle = program;
 	m_IsValid = true;
 
-	//--------------------------------------------------- Get uniform specifications
-	// Write me!
+	return true;
 }
 
 /**	Release
 *******************************************************************************/
 void MaterialResource::Release()
 {
-	if (m_Data.ShaderHandle != -1)
-		glDeleteProgram(m_Data.ShaderHandle);
+	if ( IsValid() )
+		glDeleteProgram( m_Data.ShaderHandle );
 
 	m_Data.ShaderHandle = -1;
-	Resource::Release();
-
+	m_Parent = nullptr;
+	m_VertexShader = nullptr;
+	m_FragmentShader = nullptr;
 	m_IsValid = false;
 }
 
 /**	Parse Material File
 *******************************************************************************/
-void MaterialResource::ParseMaterialFile( const char* file, MaterialSerializedData& outData )
+void MaterialResource::ParseMaterialFile( const FFile& file )
 {
-	NamedArchive::Source source = NamedArchive::Open(file);
-	NamedArchive ar(source);
+	NamedArchive::Source source = NamedArchive::Open( file.GetPath() );
+	NamedArchive ar( source );
 
-	ar.Serialize("Vertex", outData.vertexFile);
-	ar.Serialize("Fragment", outData.fragmentFile);
+	const char* parentFile = nullptr;
+	ar.Serialize( "Parent", parentFile );
+
+	// Parent material
+	if ( parentFile != nullptr )
+	{
+		m_Parent = GetManager()->Load<MaterialResource>( parentFile );
+		if (m_Parent)
+			AddDependency(m_Parent);
+		else
+			Debug_Log( "Failed to load parent material \"%s\"", parentFile );
+	}
+
+	// Shaders
+	const char* vertexFile = nullptr;
+	const char* fragmentFile = nullptr;
+
+	ar.Serialize( "Vertex", vertexFile );
+	ar.Serialize( "Fragment", fragmentFile );
+
+	if ( vertexFile != nullptr )
+	{
+		m_VertexShader = GetManager()->Load<ShaderResource>( vertexFile );
+		if ( m_VertexShader )
+			AddDependency(m_VertexShader);
+		else
+			Debug_Log( "Failed to load vertex shader \"%s\"", vertexFile );
+
+	}
+
+	if ( fragmentFile != nullptr )
+	{
+		m_FragmentShader = GetManager()->Load<ShaderResource>( fragmentFile );
+		if (m_FragmentShader)
+			AddDependency(m_FragmentShader);
+		else
+			Debug_Log( "Failed to load fragment shader \"%s\"", fragmentFile );
+	}
+
+	// If this resource did not set a vertex or fragment shader, search parents
+	MaterialResource* parent = m_Parent;
+	while ( ( !m_VertexShader || !m_FragmentShader ) && parent )
+	{
+		// Circular dependency!!!!
+		if ( !Ensure( parent != this ) )
+			break;
+
+		if ( !m_VertexShader )
+			m_VertexShader = parent->m_VertexShader;
+		if ( !m_FragmentShader )
+			m_FragmentShader = parent->m_FragmentShader;
+
+		parent = parent->m_Parent;
+	}
 }
 
 /**	Serialize Specialization
@@ -65,9 +125,9 @@ template<>
 bool NamedArchive::Serialize( const char* name, MaterialResource*& value )
 {
 	const char* resourceName = nullptr;
-	if (!Serialize(name, resourceName))
+	if ( !Serialize( name, resourceName ) )
 		return false;
 
-	value = ResourceManager::GetInstance()->LoadMaterial(resourceName);
+	value = ResourceManager::GetInstance()->Load<MaterialResource>( resourceName );
 	return true;
 }

@@ -65,7 +65,7 @@ namespace
 
 		FFile myFile;
 		TEST_EXPR( FFile( "Hello/World\\bro.exe" ) == "C:/MyGame/Hello/World/bro.exe" );
-		TEST_EXPR( FFile( "Hello/World\\bro.exe" ).GetFileName() == "bro.exe" );
+		TEST_EXPR( strcmp(FFile( "Hello/World\\bro.exe" ).GetFileName(), "bro.exe") == 0 );
 
 		{
 			FDirectoryScope scope2("Relative/");
@@ -74,6 +74,20 @@ namespace
 			TEST_EXPR( FFile( "tree.fbx" ) == "C:/MyGame/Relative/MoreRelative/tree.fbx" );
 			TEST_EXPR( FFile( "/Local/Root/tree.fbx" ) == "C:/MyGame/Local/Root/tree.fbx" );
 			TEST_EXPR( FFile( "D:/OS/Root/tree.fbx" ) == "D:/OS/Root/tree.fbx" );
+
+			{
+				FFile file1("Local/Path/shit.exe"),
+					file2(file1);
+
+				TEST_EXPR(file1 == file2);
+			}
+			{
+				FFile file1("Local/Path/shit.exe");
+				FDirectoryScope newScope("Scope/Change");
+				FFile file2(file1);
+
+				TEST_EXPR(file1 == file2);
+			}
 		}
 
 		return true;

@@ -1,14 +1,8 @@
 #include "CorePCH.h"
 #include "Resource.h"
 #include "Core/OS/File.h"
-
-/**	Constructor
-*******************************************************************************/
-Resource::Resource(ResourceManager* manager, Hash::Type hash) :
-	m_Manager(manager),
-	m_Hash(hash)
-{
-}
+#include "../OS/Directory.h"
+#include "../Tools/Time.h"
 
 /**	Destructor
 *******************************************************************************/
@@ -16,41 +10,13 @@ Resource::~Resource()
 {
 }
 
-/**	Load
-*******************************************************************************/
-bool Resource::Load(const char* path)
-{
-	m_Path = path;
-	AddFileDependency(path);
-	return true;
-}
-
-/**	Release
-*******************************************************************************/
-void Resource::Release()
-{
-	m_OnReleased.Broadcast(this);
-	m_FileDependencies.clear();
-}
-
-/**	Hot Reload
-*******************************************************************************/
-void Resource::HotReload()
-{
-	Release();
-	Load(m_Path.c_str());
-	m_OnHotReloaded.Broadcast(this);
-}
-
 /**	Has Changed
 *******************************************************************************/
 bool Resource::ShouldReload()
 {
-	for(FFileDependency& dependency : m_FileDependencies)
+	if (m_File.GetModifiedTime() != m_LastModifiedTime)
 	{
-		time_t modTime = dependency.File.GetModifiedTime();
-		if (modTime > dependency.LastModifiedTime)
-			return true;
+		return true;
 	}
 
 	return false;
@@ -67,21 +33,106 @@ bool Resource::Equals(const Resource* other) const
 #if DEBUG
 	// In debug we wanna double-check that the paths are actually equal
 	// if this triggers, the hash is not unique enough
-	Ensure(m_Path == other->m_Path);
+	Ensure(m_File == other->m_File);
 #endif
 
 	return isEquals;
 }
 
-/**	Add File Dependency
+/**	Add Dependency
 *******************************************************************************/
-void Resource::AddFileDependency( const std::string& path )
+void Resource::AddDependency( Resource* other )
 {
-	FFileDependency dependency;
-	dependency.File = path;
-	dependency.LastModifiedTime = dependency.File.GetModifiedTime();
+	if (m_Dependencies.find(other) != m_Dependencies.end())
+		return;
 
-	m_FileDependencies.push_back(dependency);
+	m_Dependencies.insert(other);
+	other->AddDependentResource(this);
+}
+
+/**	Load Internal
+*******************************************************************************/
+bool Resource::Load_Internal( const FFile& file )
+{
+	// Handles tab formatting when loading resource dependencies, so it's easier to read :)
+	static int Recursion = 0;
+
+	char indentString[20];
+	for(int i=0; i<Recursion; ++i)
+		indentString[i] = '\t';
+
+	indentString[Recursion] = '\0';
+
+	Recursion++;
+	//
+
+	bool firstTimeLoad = (m_File == "");
+
+	Debug_Log("%s%s \"%s\"...", indentString, firstTimeLoad ? "Loading" : "Hot-reloading", file.GetFileName());
+	FTimePoint timePoint;
+
+	FDirectoryScope scope(file.GetPath());
+
+	m_File = file;
+	m_LastModifiedTime = file.GetModifiedTime();
+	bool result = Load(file);
+
+	for(Resource* dependentResource : m_DependentResources)
+		dependentResource->HotReload_Internal();
+
+	Debug_Log("%s\"%s\" %s %s! ( %f seconds )", indentString, file.GetFileName(), firstTimeLoad ? "loading" : "hot-reloading", result ? "SUCCESS" : "FAIL", timePoint.Elapsed());
+	
+	Recursion--;
+	return result;
+}
+
+/**	Release Internal
+*******************************************************************************/
+void Resource::Release_Internal()
+{
+	Release();
+
+	m_OnReleased();
+}
+
+/**	HotReload Internal
+*******************************************************************************/
+void Resource::HotReload_Internal()
+{
+	Release_Internal();
+	Load_Internal(m_File);
+
+	m_OnHotReloaded();
+}
+
+/**	Clear Dependencies
+*******************************************************************************/
+void Resource::ClearDependencies()
+{
+	for(Resource* depencency : m_Dependencies)
+	{
+		depencency->RemoveDependentResource(this);
+	}
+
+	m_Dependencies.clear();
+}
+
+/**	Add Dependent Resource
+*******************************************************************************/
+void Resource::AddDependentResource( Resource* other )
+{
+	// Already dependent
+	if (m_DependentResources.find(other) != m_DependentResources.end())
+		return;
+
+	m_DependentResources.insert(other);
+}
+
+/**	Remove Dependent Resource
+*******************************************************************************/
+void Resource::RemoveDependentResource( Resource* other )
+{
+	m_DependentResources.erase(other);
 }
 
 #include "ResourceManager.h"
@@ -94,6 +145,6 @@ bool NamedArchive::Serialize<Resource*>(const char* name, Resource*& value)
 	if (!Serialize(name, resourceName))
 		return false;
 
-	value = ResourceManager::GetInstance()->Load(name);
+	value = ResourceManager::GetInstance()->Load<Resource>(name);
 	return true;
 }

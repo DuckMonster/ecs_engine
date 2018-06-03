@@ -12,7 +12,7 @@ using namespace std;
 
 /**	Get File From Path
 *******************************************************************************/
-std::string FFile::GetFileNameFromPath( const char* path )
+const char* FFile::GetFileNameFromPath( const char* path )
 {
 	int lastSlash = 0;
 	int pathLen = (int)strlen( path );
@@ -34,13 +34,43 @@ std::string FFile::GetFileNameFromPath( const char* path )
 
 	// No file here, return empty
 	if ( !containsFile )
-		return std::string();
+		return nullptr;
 
 	// No slashes so just return all of it
 	if (lastSlash == 0)
 		return path;
 
-	return std::string( path + lastSlash + 1 );
+	return (path + lastSlash + 1);
+}
+
+/**	Get Extension From Path
+*******************************************************************************/
+const char* FFile::GetExtensionFromPath( const char* path )
+{
+	int lastPeriod = 0;
+	int pathLen = (int)strlen( path );
+	bool containsFile = false;
+
+	for ( int i = 0; i < pathLen; ++i )
+	{
+		if ( path[i] == '\\' || path[i] == '/' )
+		{
+			containsFile = false;
+		}
+
+		else if ( path[i] == '.' )
+		{
+			lastPeriod = i;
+			containsFile = true;
+		}
+	}
+
+	// No file here, return empty
+	if ( !containsFile )
+		return nullptr;
+
+	// No slashes so just return all of it
+	return (path + lastPeriod + 1);
 }
 
 /**	Constructor
@@ -121,9 +151,31 @@ time_t FFile::GetModifiedTime() const
 
 /**	Get File Name
 *******************************************************************************/
-std::string FFile::GetFileName() const
+const char* FFile::GetFileName() const
 {
 	return GetFileNameFromPath(m_Path.c_str());
+}
+
+/**	Get Extension
+*******************************************************************************/
+const char* FFile::GetExtension() const
+{
+	return GetExtensionFromPath(m_Path.c_str());
+}
+
+/**	File comparison
+*******************************************************************************/
+bool FFile::operator==( const FFile& other ) const
+{
+	return m_Path == other.m_Path;
+}
+
+/**	Equals other file
+*******************************************************************************/
+FFile& FFile::operator=( const FFile& other )
+{
+	m_Path = other.m_Path;
+	return *this;
 }
 
 /**	Equals char*

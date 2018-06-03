@@ -1,4 +1,4 @@
 {
-	"Vertex": "Resource/Shader/Deferred/shadow.vert",
-	"Fragment": "Resource/Shader/Deferred/shadow.frag"
+	"Vertex": "/Resource/Shader/Deferred/shadow.vert",
+	"Fragment": "/Resource/Shader/Deferred/shadow.frag"
 }

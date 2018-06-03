@@ -5,9 +5,7 @@
 class MeshResource : public Resource
 {
 public:
-	MeshResource(ResourceManager* manager, guid_t hash) : Resource(manager, hash) {}
-
-	bool Load(const char* path) override;
+	bool Load(const FFile& file) override;
 	void Release() override;
 
 	const Rendering::MeshData& GetData() const { return m_Data; }

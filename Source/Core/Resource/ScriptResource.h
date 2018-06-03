@@ -7,12 +7,10 @@ class ScriptFunction;
 class ScriptResource : public Resource
 {
 public:
-	ScriptResource(ResourceManager* manager, guid_t hash) : Resource(manager, hash) {}
-
-	bool Load(const char* path) override;
+	bool Load( const FFile& file ) override;
 	void Release() override;
 
-	ScriptFunction GetFunction(const char* declaration);
+	ScriptFunction GetFunction( const char* declaration );
 
 private:
 	asIScriptModule* m_Module = nullptr;
@@ -23,4 +21,4 @@ private:
 /**	Script Resource Archive Serialization
 *******************************************************************************/
 template<>
-bool NamedArchive::Serialize<ScriptResource*>(const char* name, ScriptResource*& value);
+bool NamedArchive::Serialize<ScriptResource*>( const char* name, ScriptResource*& value );

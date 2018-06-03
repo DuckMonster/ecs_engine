@@ -6,14 +6,14 @@
 
 /**	Load
 *******************************************************************************/
-bool MeshResource::Load(const char* path)
+bool MeshResource::Load(const FFile& file)
 {
 	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate);
+	const aiScene* scene = importer.ReadFile(file.GetPath(), aiProcess_Triangulate);
 
 	if (!scene)
 	{
-		Debug_Log("Failed to load mesh \"%s\": %s", path, importer.GetErrorString());
+		Debug_Log("Failed to load mesh \"%s\": %s", file.GetPath(), importer.GetErrorString());
 		return false;
 	}
 
@@ -70,10 +70,10 @@ bool MeshResource::Load(const char* path)
 	}
 
 	m_Data.DrawMode = GL_TRIANGLES;
-	m_Data.DrawCount = positionData.size();
+	m_Data.DrawCount = (GLuint)positionData.size();
 	m_Data.UseElements = false;
 
-	return Resource::Load(path);
+	return true;
 }
 
 /**	Release
@@ -97,6 +97,6 @@ bool NamedArchive::Serialize<MeshResource*>(const char* name, MeshResource*& val
 	if (!Serialize(name, resourceName))
 		return false;
 
-	value = ResourceManager::GetInstance()->LoadMesh(resourceName);
+	value = ResourceManager::GetInstance()->Load<MeshResource>(resourceName);
 	return true;
 }

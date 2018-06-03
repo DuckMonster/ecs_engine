@@ -4,65 +4,58 @@
 #include "Core/Tools/SingletonClass.h"
 #include "Core/Tools/Time.h"
 #include "Core/Tools/Timer.h"
+#include "Core/OS/Directory.h"
 
 class Resource;
-class MeshResource;
-class ScriptResource;
-class MaterialResource;
 
 class ResourceManager : public SingletonClass<ResourceManager>
 {
 public:
-	Resource* Load(const char* path);
-	MeshResource* LoadMesh(const char* path);
-	ScriptResource* LoadScript(const char* path);
-	MaterialResource* LoadMaterial(const char* path);
-	void Release(Resource* resource);
+	template<class TResource>
+	TResource* Load(const char* path);
 
+	void Release(Resource* resource);
 	void UpdateResourceHotReloading();
 
 private:
-	template<typename TResource>
-	TResource* GetOrCreateResource(const char* path);
-
 	std::unordered_map<Hash::Type, Resource*> m_ResourceMap;
 	std::vector<Resource*> m_HotloadResources;
 
 	Timer m_HotReloadTimer = Timer(0.5f);
 };
 
-/**	Get Or Create Resource
+/**	Load Resource
 *******************************************************************************/
-template<typename TResource>
-TResource* ResourceManager::GetOrCreateResource(const char* path)
+template<class TResource>
+TResource* ResourceManager::Load(const char* path)
 {
-	if (!Ensure(FFile(path).Exists()))
+	FFile file(path);
+
+	if (!file.Exists())
+	{
+		Debug_Log("Resource file \"%s\" doesn't exist", file.GetPath());
 		return nullptr;
+	}
 
 	Hash::Type hash = Hash::FNV(path, strlen(path));
+
+	// Check if resource is already loaded
 	TResource* resource = (TResource*)m_ResourceMap[hash];
 	
 	if (resource)
 	{
 #if DEBUG
-		Ensure(::strcmp(path, resource->GetPath()) == 0);
+		// Make sure there are no hash overlaps
+		Ensure(file == resource->GetFile());
 #endif
 		return resource;
 	}
 
-	resource = new TResource(this, hash);
-	
-	FTimePoint timePoint;
-	Debug_Log("Loading resource \"%s\"...", path);
-
-	if (!resource->Load(path))
-	{
-		Debug_Log("Resource \"%s\" failed to load", path);
-		delete resource;
-		return nullptr;
-	}
-
-	Debug_Log("\"%s\" loaded (%f seconds)", path, timePoint.Elapsed());
+	// Load it up!
+	resource = new TResource();
+	resource->SetManager(this);
+	resource->SetHash(hash);
+	resource->Load_Internal(file);
 
 	m_ResourceMap[hash] = resource;
 	m_HotloadResources.push_back(resource);

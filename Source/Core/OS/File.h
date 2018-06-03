@@ -2,7 +2,8 @@
 class FFile
 {
 public:
-	static std::string GetFileNameFromPath(const char* path);
+	static const char* GetFileNameFromPath(const char* path);
+	static const char* GetExtensionFromPath(const char* path);
 
 public:
 	FFile();
@@ -14,14 +15,17 @@ public:
 	bool ReadAll(std::string& outContent) const;
 
 	time_t GetModifiedTime() const;
-	std::string GetFileName() const;
-	const std::string& GetFilePath() const { return m_Path; }
+	const char* GetFileName() const;
+	const char* GetPath() const { return m_Path.c_str(); }
+	const char* GetExtension() const;
 
 	// Operators
 	bool operator==(const char* path) const;
 	bool operator==(const std::string& path) const { return *this == path.c_str(); }
+	bool operator==(const FFile& other) const;
 	FFile& operator=(const char* path);
 	FFile& operator=(const std::string& path) { return (*this = path.c_str()); }
+	FFile& operator=(const FFile& other);
 
 private:
 	std::string m_Path;

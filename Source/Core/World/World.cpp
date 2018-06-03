@@ -118,7 +118,7 @@ void World::DestroyEntity(entity_id id)
 
 /**	Map Resource Reloaded
 *******************************************************************************/
-void World::MapResourceReloaded(Resource* resource)
+void World::MapResourceReloaded()
 {
 	Debug_Log("World::MapResourceReloaded");
 	LoadFromResource();
@@ -131,7 +131,7 @@ void World::LoadMap(const char* path)
 	if (!Ensure(m_MapResource == nullptr))
 		return;
 
-	m_MapResource = ResourceManager::GetInstance()->Load(path);
+	m_MapResource = ResourceManager::GetInstance()->Load<Resource>(path);
 	m_MapResource->m_OnHotReloaded.BindObject(this, &World::MapResourceReloaded);
 
 	LoadFromResource();
@@ -172,7 +172,7 @@ void World::LoadFromResource()
 	if (m_MapResource == nullptr)
 		return;
 
-	NamedArchive::Source source = NamedArchive::Open(m_MapResource->GetPath());
+	NamedArchive::Source source = NamedArchive::Open(m_MapResource->GetFile().GetPath());
 	NamedArchive archive(source);
 
 	const char* mapName = nullptr;

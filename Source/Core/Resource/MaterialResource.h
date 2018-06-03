@@ -2,29 +2,24 @@
 #include "Resource.h"
 #include "Core/Rendering/RenderData.h"
 
+class ShaderResource;
+
 class MaterialResource : public Resource
 {
-	struct MaterialSerializedData
-	{
-		std::string vertexFile;
-		std::string fragmentFile;
-
-		std::vector<Rendering::UniformValue> uniforms;
-	};
-
 public:
-	MaterialResource( ResourceManager* manager, guid_t hash ) : Resource( manager, hash ) {}
-
-	bool Load( const char* path ) override;
+	bool Load( const FFile& file ) override;
 	void Release() override;
 
 	const Rendering::MaterialData& GetData() const { return m_Data; }
-
 	bool IsValid() const { return m_IsValid; }
 
-	void ParseMaterialFile( const char* file, MaterialSerializedData& outData );
+	void ParseMaterialFile( const FFile& file );
 
 private:
+	MaterialResource* m_Parent = nullptr;
+	ShaderResource* m_VertexShader = nullptr;
+	ShaderResource* m_FragmentShader = nullptr;
+
 	Rendering::MaterialData m_Data;
 	bool m_IsValid = false;
 };

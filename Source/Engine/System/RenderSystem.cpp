@@ -40,7 +40,7 @@ void RenderSystem::RunInternal(Entity* entity, const TransformComponent* transfo
 	MeshResource* mesh = renderable->m_Mesh;
 	MaterialResource* material = renderable->m_Material;
 
-	if (!mesh || !material)
+	if (!mesh || !material || !material->IsValid())
 		return;
 
 	RenderableData data;

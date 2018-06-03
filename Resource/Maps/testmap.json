@@ -16,8 +16,8 @@
 				},
 				{
 					"type": "RenderableComponent",
-					"Mesh": "Resource/Mesh/plane.fbx",
-					"Material": "Resource/Material/testmaterial.json"
+					"Mesh": "/Resource/Mesh/plane.fbx",
+					"Material": "/Resource/Material/floormaterial.json"
 				}
 			]
 		},
@@ -33,8 +33,8 @@
 				},
 				{
 					"type": "RenderableComponent",
-					"Mesh": "Resource/Mesh/cube.fbx",
-					"Material": "Resource/Material/testmaterial.json"
+					"Mesh": "/Resource/Mesh/cube.fbx",
+					"Material": "/Resource/Material/cubematerial.json"
 				}
 			]
 		},
@@ -50,8 +50,8 @@
 				},
 				{
 					"type": "RenderableComponent",
-					"Mesh": "Resource/Mesh/cube.fbx",
-					"Material": "Resource/Material/testmaterial.json"
+					"Mesh": "/Resource/Mesh/cube.fbx",
+					"Material": "/Resource/Material/cubematerial.json"
 				}
 			]
 		},
@@ -67,8 +67,8 @@
 				},
 				{
 					"type": "RenderableComponent",
-					"Mesh": "Resource/Mesh/cube.fbx",
-					"Material": "Resource/Material/testmaterial.json"
+					"Mesh": "/Resource/Mesh/cube.fbx",
+					"Material": "/Resource/Material/cubematerial.json"
 				}
 			]
 		},
@@ -84,12 +84,12 @@
 				},
 				{
 					"type": "RenderableComponent",
-					"Mesh": "Resource/Mesh/cube.fbx",
-					"Material": "Resource/Material/testmaterial.json"
+					"Mesh": "/Resource/Mesh/cube.fbx",
+					"Material": "/Resource/Material/cubematerial.json"
 				},
 				{
 					"type": "BehaviourComponent",
-					"Script": "Resource/Script/testscript.as"
+					"Script": "/Resource/Script/testscript.as"
 				}
 			]
 		},
@@ -110,7 +110,7 @@
 				},
 				{
 					"type": "BehaviourComponent",
-					"Script": "Resource/Script/camerascript.as"
+					"Script": "/Resource/Script/camerascript.as"
 				}
 			]
 		}

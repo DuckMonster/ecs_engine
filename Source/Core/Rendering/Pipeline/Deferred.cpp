@@ -168,13 +168,13 @@ void Rendering::DeferredPipeline::Init()
 	// Light material
 	if ( m_LightingMaterial == nullptr )
 	{
-		m_LightingMaterial = ResourceManager::GetInstance()->LoadMaterial( "Resource/Material/Deferred/Light.json" );
+		m_LightingMaterial = ResourceManager::GetInstance()->Load<MaterialResource>( "Resource/Material/Deferred/Light.json" );
 	}
 
 	// Shadow material
 	if ( m_ShadowMaterial == nullptr )
 	{
-		m_ShadowMaterial = ResourceManager::GetInstance()->LoadMaterial( "Resource/Material/Deferred/Shadow.json" );
+		m_ShadowMaterial = ResourceManager::GetInstance()->Load<MaterialResource>( "Resource/Material/Deferred/Shadow.json" );
 	}
 
 	EnsureValid();

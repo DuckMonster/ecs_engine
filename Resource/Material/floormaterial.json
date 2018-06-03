@@ -1,4 +1,4 @@
 {
-	"parent": "testmaterial.json",
+	"Parent": "Child/testmaterial2.json",
 	"u_Color": [0.5, 0.2, 0.2]
 }

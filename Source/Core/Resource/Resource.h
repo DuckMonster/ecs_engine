@@ -1,51 +1,66 @@
 #pragma once
 #include "Core/Delegate/Delegate.h"
 #include "Core/OS/File.h"
+#include <set>
 
 class ResourceManager;
 
 class Resource
 {
+	friend class ResourceManager;
+
 private:
-	struct FFileDependency
-	{
-		FFile File;
-		time_t LastModifiedTime;
-	};
 
 public:
 	typedef Hash::Type guid_t;
 
 public:
-	Resource(ResourceManager* manager, guid_t hash);
 	virtual ~Resource();
 
-	virtual bool Load(const char* path);
-	virtual void Release();
-	virtual void HotReload();
+	virtual bool Load(const FFile& file) { return true; }
+	virtual void Release() {}
 
-	const ResourceManager* GetManager() const { return m_Manager; }
-	const char* GetPath() const { return m_Path.c_str(); }
+	ResourceManager* GetManager() const { return m_Manager; }
 	const guid_t& GetHash() const { return m_Hash; }
+	const FFile& GetFile() const { return m_File; }
+	const char* GetPath() const { return m_File.GetPath(); }
+	const char* GetFileName() const { return m_File.GetFileName(); }
 
 	bool ShouldReload();
 
 	bool Equals(const Resource* other) const;
 
-	Delegate<void, Resource*> m_OnHotReloaded;
-	Delegate<void, Resource*> m_OnReleased;
+	Delegate<void> m_OnHotReloaded;
+	Delegate<void> m_OnReleased;
 
 protected:
-	void AddFileDependency(const std::string& path);
+	void AddDependency(Resource* other);
 
 private:
-	ResourceManager* const m_Manager;
-	std::string m_Path;
-	const guid_t m_Hash;
+	/* Internal functions called by ResourceManager */
+	void SetManager(ResourceManager* manager) { m_Manager = manager; }
+	void SetHash(guid_t hash) { m_Hash = hash; }
+	void SetFile(const FFile& file) { m_File = file; }
 
-	std::vector<FFileDependency> m_FileDependencies;
+	bool Load_Internal(const FFile& file);
+	void Release_Internal();
+	void HotReload_Internal();
+	/* ************** */
 
-	time_t m_ModifiedTime;
+	void ClearDependencies();
+	void AddDependentResource(Resource* other);
+	void RemoveDependentResource(Resource* other);
+
+	ResourceManager* m_Manager;
+	guid_t m_Hash;
+
+	FFile m_File;
+
+	std::set<Resource*> m_Dependencies;
+	std::set<Resource*> m_DependentResources;
+
+	// Used for checking if resource should be hot-reloaded
+	time_t m_LastModifiedTime;
 };
 
 #include "Core/Serialize/NamedArchive.h"

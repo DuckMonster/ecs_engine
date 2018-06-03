@@ -7,34 +7,6 @@
 #include "Core/OS/File.h"
 #include "Core/Tools/Time.h"
 
-/**	Load
-*******************************************************************************/
-Resource* ResourceManager::Load(const char* path)
-{
-	return GetOrCreateResource<Resource>(path);
-}
-
-/**	Load Mesh
-*******************************************************************************/
-MeshResource* ResourceManager::LoadMesh(const char* path)
-{
-	return GetOrCreateResource<MeshResource>(path);
-}
-
-/**	Load Script
-*******************************************************************************/
-ScriptResource* ResourceManager::LoadScript(const char* path)
-{
-	return GetOrCreateResource<ScriptResource>(path);
-}
-
-/**	Load Material
-*******************************************************************************/
-MaterialResource* ResourceManager::LoadMaterial( const char* path )
-{
-	return GetOrCreateResource<MaterialResource>(path);
-}
-
 /**	Release
 *******************************************************************************/
 void ResourceManager::Release(Resource* resource)
@@ -59,6 +31,8 @@ void ResourceManager::Release(Resource* resource)
 			m_HotloadResources.erase(it);
 	}
 
+	resource->Release_Internal();
+
 	delete resource;
 }
 
@@ -81,8 +55,7 @@ void ResourceManager::UpdateResourceHotReloading()
 
 		for (Resource* res : resourcesToReload)
 		{
-			Debug_Log("Hot-reloading \"%s\"...", res->GetPath());
-			res->HotReload();
+			res->HotReload_Internal();
 		}
 	}
 }

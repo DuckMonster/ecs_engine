@@ -105,7 +105,7 @@ GLuint FrameBuffer::AddColorTexture( int components, bool hdr )
 	glTexImage2D( GL_TEXTURE_2D, 0, intType, m_Width, m_Height, 0, extType, hdr ? GL_FLOAT : GL_UNSIGNED_BYTE, nullptr );
 
 	glBindFramebuffer( GL_FRAMEBUFFER, m_Handle );
-	glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + textureIndex, GL_TEXTURE_2D, texture, 0 );
+	glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + (GLenum)textureIndex, GL_TEXTURE_2D, texture, 0 );
 	glBindFramebuffer( GL_FRAMEBUFFER, 0 );
 
 	m_Textures.push_back( texture );
