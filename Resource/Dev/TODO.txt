@@ -1,7 +1,5 @@
 * Implement forward rendering
 
-* Directory stack and recursive file loading (resource dependency and relative paths)
-
 * Implement headless
 
 * Input management
