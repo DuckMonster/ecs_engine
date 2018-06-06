@@ -120,7 +120,6 @@ void World::DestroyEntity(entity_id id)
 *******************************************************************************/
 void World::MapResourceReloaded()
 {
-	Debug_Log("World::MapResourceReloaded");
 	LoadFromResource();
 }
 

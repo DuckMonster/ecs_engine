@@ -114,13 +114,13 @@ bool FFile::Exists() const
 *******************************************************************************/
 bool FFile::ReadAll( std::string& outContent ) const
 {
-	if (!Ensure(Exists()))
+	if (!Exists())
 		return false;
 
 	// Open file
 	static char buffer[1 << 14];
 	ifstream fileStream(m_Path.c_str(), ifstream::binary);
-	if (!Ensure(fileStream.is_open()))
+	if (!fileStream.is_open())
 		return false;
 
 	// Read whole stream

@@ -1,4 +1,10 @@
 {
-	"Parent": "Child/testmaterial2.json",
-	"u_Color": [0.95, 0.4, 0.4]
+	"Parent": "testmaterial.json",
+	"Fragment": "/Resource/Shader/cube.frag",
+	"Textures":
+	[
+		"/Resource/Texture/cube.png"
+	],
+		
+	"u_Color": [0.8, 0.5, 0.4]
 }

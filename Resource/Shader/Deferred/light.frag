@@ -11,6 +11,7 @@ struct Light
 	sampler2D shadowBuffer;
 	mat4 matrix;
 	mat4 matrixInv;
+	vec3 direction;
 };
 
 struct ViewInfo
@@ -57,8 +58,19 @@ float shadow(float depth, vec3 normal)
 	// Bias the lightdepth a bit as well
 	//lightDepth += 0.0016;
 
-	return step(lightDepth, lightSpace.z);
+	return step(lightSpace.z, lightDepth);
 	//return lightDepth;
+}
+
+float ambient()
+{
+	return 0.15;
+}
+
+float diffuse(vec3 normal)
+{
+	float diff = dot(normal, -u_Light.direction);
+	return diff * step(0.0, diff);
 }
 
 void main()
@@ -68,7 +80,17 @@ void main()
 	vec3 normal = texture(u_Deferred.normal, f_UV).xyz;
 	float depth = texture(u_Deferred.depth, f_UV).x;
 
+	if (length(normal) < 0.1)
+	{
+		const vec4 skyColor = vec4(0.15, 0.15, 0.25, 1.0);
+		o_Color = mix(skyColor * 0.4, skyColor, f_UV.y);
+		return;
+	}
+
+	float ambient = ambient();
+	float diffuse = diffuse(normal);
 	float shadow = shadow(depth, normal);
+	diffuse = diffuse * mix(0.04, 1.0, shadow);
 
 	//o_Color = texture((u_Deferred.color), f_UV) / 5.0;
 	//o_Color = vec4(shadow(), shadow(), shadow(), 1.0);
@@ -76,7 +98,7 @@ void main()
 	//o_Color = texture(u_Deferred.color, f_UV) * (1.0 - shadow());
 	//o_Color = texture(u_Light.shadowBuffer, f_UV);
 
-	o_Color = vec4(color * (1.0 - shadow), 1.0);
+	o_Color = vec4(color * (ambient + diffuse), 1.0);
 
 	//o_Color = vec4(depthToWorld(texture(u_Deferred.depth, f_UV).x), 1.0);
 	//o_Color = texture(u_Deferred.depth, f_UV);

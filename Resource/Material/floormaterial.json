@@ -1,4 +1,5 @@
 {
-	"Parent": "Child/testmaterial2.json",
+	"Parent": "testmaterial.json",
+	"Fragment": "/Resource/Shader/floor.frag",
 	"u_Color": [0.5, 0.2, 0.2]
 }

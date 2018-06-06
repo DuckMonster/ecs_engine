@@ -5,6 +5,8 @@
 
 using namespace rapidjson;
 
+/**	Open
+*******************************************************************************/
 NamedArchive::Source NamedArchive::Open(const char* path)
 {
 	Source source;
@@ -25,16 +27,22 @@ NamedArchive::Source NamedArchive::Open(const char* path)
 	return source;
 }
 
+/**	Push Name
+*******************************************************************************/
 NamedArchive NamedArchive::Push(const char* name)
 {
 	return NamedArchive(m_Source, m_Pointer.Append(name));
 }
 
+/**	Push Index
+*******************************************************************************/
 NamedArchive NamedArchive::Push(uint32 index)
 {
 	return NamedArchive(m_Source, m_Pointer.Append(index));
 }
 
+/**	Is Array
+*******************************************************************************/
 bool NamedArchive::IsArray()
 {
 	Value* value = m_Pointer.Get(m_Source.m_Document);
@@ -44,13 +52,20 @@ bool NamedArchive::IsArray()
 	return value->IsArray();
 }
 
+/**	Array Size
+*******************************************************************************/
 uint32 NamedArchive::ArraySize()
 {
 	Value* value = m_Pointer.Get(m_Source.m_Document);
 	if (value == nullptr)
-		return false;
+		return 0;
 
 	return value->Size();
+}
+
+bool NamedArchive::IsValid()
+{
+	return m_Pointer.Get(m_Source.m_Document) != nullptr;
 }
 
 //--------------------------------------------------- Specializations!

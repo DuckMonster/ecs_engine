@@ -32,6 +32,7 @@ public:
 
 	bool IsArray();
 	uint32 ArraySize();
+	bool IsValid();
 
 private:
 	Source& m_Source;

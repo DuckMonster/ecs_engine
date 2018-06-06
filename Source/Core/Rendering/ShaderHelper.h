@@ -1,4 +1,6 @@
 #pragma once
+#include "RenderData.h"
+
 #define SPEC_DECL(type)\
 void Set(const char* uniform, const type& value)
 
@@ -16,6 +18,9 @@ public:
 	SPEC_DECL(glm::mat2);
 	SPEC_DECL(glm::mat3);
 	SPEC_DECL(glm::mat4);
+
+	void SetMultiple(const std::vector<Rendering::UniformValue>& uniforms);
+	void Set(const Rendering::UniformValue& uniform);
 
 private:
 	GLuint m_Shader;

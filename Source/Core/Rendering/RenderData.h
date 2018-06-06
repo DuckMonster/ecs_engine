@@ -8,8 +8,7 @@ namespace Rendering
 		Int,
 		Vec2,
 		Vec3,
-		Vec4,
-		Matrix
+		Vec4
 	};
 
 	struct UniformValue
@@ -28,6 +27,7 @@ namespace Rendering
 	{
 		GLuint ShaderHandle;
 		std::vector<UniformValue> UniformValues;
+		std::vector<GLuint> Textures;
 	};
 
 	struct MeshData

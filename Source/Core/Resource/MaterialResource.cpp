@@ -3,6 +3,7 @@
 #include "Core/Tools/GLUtils.h"
 #include "ResourceManager.h"
 #include "ShaderResource.h"
+#include "TextureResource.h"
 
 /**	Load
 *******************************************************************************/
@@ -37,6 +38,11 @@ bool MaterialResource::Load( const FFile& file )
 	}
 
 	m_Data.ShaderHandle = program;
+	for (TextureResource* texture : m_Textures)
+	{
+		m_Data.Textures.push_back(texture->GetTextureHandle());
+	}
+
 	m_IsValid = true;
 
 	return true;
@@ -116,6 +122,37 @@ void MaterialResource::ParseMaterialFile( const FFile& file )
 			m_FragmentShader = parent->m_FragmentShader;
 
 		parent = parent->m_Parent;
+	}
+
+	// Textures
+	std::vector<const char*> textureFiles;
+	ar.SerializeArray("Textures", textureFiles);
+
+	for(const char* file : textureFiles)
+	{
+		TextureResource* texture = GetManager()->Load<TextureResource>(file);
+		if (texture != nullptr)
+		{
+			AddDependency(texture);
+			m_Textures.push_back(texture);
+		}
+	}
+
+	// Parse uniforms
+	ParseUniforms(ar.Push("Uniforms"));
+}
+
+/**	Parse Uniforms
+*******************************************************************************/
+void MaterialResource::ParseUniforms( NamedArchive& archive )
+{
+	int uniformNum = archive.ArraySize();
+	for(int i=0; i<uniformNum; ++i)
+	{
+		NamedArchive uniform = archive.Push(i);
+		const char* name = nullptr;
+
+		uniform.Serialize("Name", name);
 	}
 }
 

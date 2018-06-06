@@ -12,7 +12,7 @@ public:
 
 private:
 	Rendering::MeshData m_Data;
-	GLuint m_Buffers[3];
+	GLuint m_Buffers[4];
 };
 
 #include "Core/Serialize/NamedArchive.h"

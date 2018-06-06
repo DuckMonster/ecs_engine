@@ -9,6 +9,7 @@ uniform mat4 u_ModelNormal;
 
 out vec3 f_World;
 out vec3 f_Normal;
+out vec2 f_UV;
 
 void main()
 {
@@ -16,5 +17,6 @@ void main()
 	gl_Position = u_Camera * world;
 
 	f_World = world.xyz;
-	f_Normal = (u_ModelNormal * vec4(a_Normal, 1.0)).xyz;
+	f_Normal = normalize((u_ModelNormal * vec4(a_Normal, 1.0)).xyz);
+	f_UV = a_UV;
 }

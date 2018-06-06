@@ -47,8 +47,9 @@ void Rendering::DeferredPipeline::Render_GBuffer( const RenderManifest& manifest
 {
 	FrameBufferScope scope( m_GFrameBuffer );
 
-	glClearColor( 0.1f, 0.1f, 0.1f, 1.f );
+	glClearColor( 0.f, 0.f, 0.f, 1.f );
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+	glCullFace(GL_BACK);
 
 	for ( const RenderableData& renderable : manifest.RenderList )
 	{
@@ -61,6 +62,11 @@ void Rendering::DeferredPipeline::Render_GBuffer( const RenderManifest& manifest
 		helper.Set( "u_Camera", manifest.CameraMatrix );
 		helper.Set( "u_Model", renderable.ModelMatrix );
 		helper.Set( "u_ModelNormal", renderable.NormalMatrix );
+
+		for(int i=0; i<renderable.Material.Textures.size(); ++i)
+		{
+			glBindTexture(GL_TEXTURE_2D, renderable.Material.Textures[i]);
+		}
 
 		// Draw!
 		if ( renderable.Mesh.UseElements )
@@ -82,7 +88,7 @@ void Rendering::DeferredPipeline::Render_Shadows( const RenderManifest& manifest
 	ShaderHelper helper( m_ShadowMaterial->GetData().ShaderHandle );
 
 	// TEMP LIGHT
-	glm::mat4 tempLight = glm::ortho( -5.f, 5.f, -5.f, 5.f, -10.f, 10.f );
+	glm::mat4 tempLight = glm::ortho( -20.f, 20.f, -20.f, 20.f, -50.f, 50.f );
 	tempLight *= glm::lookAt( glm::vec3( 1.f ), glm::vec3( 0.f ), glm::vec3( 0.f, 1.f, 0.f ) );
 	helper.Set( "u_Camera", tempLight );
 	//-----------
@@ -111,8 +117,9 @@ void Rendering::DeferredPipeline::Render_Lighting( const RenderManifest& manifes
 
 	GLuint shaderHandle = m_LightingMaterial->GetData().ShaderHandle;
 
-	glm::mat4 tempLight = glm::ortho( -5.f, 5.f, -5.f, 5.f, -10.f, 10.f );
+	glm::mat4 tempLight = glm::ortho( -20.f, 20.f, -20.f, 20.f, -50.f, 50.f );
 	tempLight *= glm::lookAt( glm::vec3( 1.f ), glm::vec3( 0.f ), glm::vec3( 0.f, 1.f, 0.f ) );
+	glm::vec3 tempLightDir = glm::normalize(-glm::vec3(1.f));
 
 	ShaderHelper shaderHelper( shaderHandle );
 	shaderHelper.Set( "u_Deferred.color", 0 );
@@ -120,6 +127,7 @@ void Rendering::DeferredPipeline::Render_Lighting( const RenderManifest& manifes
 	shaderHelper.Set( "u_Deferred.depth", 2 );
 	shaderHelper.Set( "u_Light.shadowBuffer", 3 );
 	shaderHelper.Set( "u_Light.matrix", tempLight );
+	shaderHelper.Set( "u_Light.direction",  tempLightDir);
 
 	// View Info
 	shaderHelper.Set( "u_ViewInfo.viewProjInv", manifest.CameraMatrixInv );
