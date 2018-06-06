@@ -51,28 +51,37 @@ void Rendering::DeferredPipeline::Render_GBuffer( const RenderManifest& manifest
 	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 	glCullFace(GL_BACK);
 
-	for ( const RenderableData& renderable : manifest.RenderList )
+	for (uint32 i = 0; i < manifest.RenderList.size(); ++i)
 	{
+		const RenderableData& renderable = manifest.RenderList[i];
 		GLuint shader = renderable.Material.ShaderHandle;
 
-		glBindVertexArray( renderable.Mesh.VertexObject );
 		ShaderHelper helper( shader );
 
-		// Setup matrices
+		// Camera matrix is persistent through all meshes
 		helper.Set( "u_Camera", manifest.CameraMatrix );
-		helper.Set( "u_Model", renderable.ModelMatrix );
-		helper.Set( "u_ModelNormal", renderable.NormalMatrix );
 
-		for(int i=0; i<renderable.Material.Textures.size(); ++i)
+		for(uint32 i=0; i<renderable.Material.Textures.size(); ++i)
 		{
 			glBindTexture(GL_TEXTURE_2D, renderable.Material.Textures[i]);
 		}
 
-		// Draw!
-		if ( renderable.Mesh.UseElements )
-			glDrawElements( renderable.Mesh.DrawMode, renderable.Mesh.DrawCount, GL_UNSIGNED_INT, nullptr );
-		else
-			glDrawArrays( renderable.Mesh.DrawMode, 0, renderable.Mesh.DrawCount );
+		for(uint32 i=0; i<renderable.Meshes.size(); ++i)
+		{
+			const MeshData& mesh = renderable.Meshes[i];
+
+			glBindVertexArray( mesh.VertexObject );
+
+			// Setup matrices
+			helper.Set( "u_Model", renderable.ModelMatrix * mesh.Transform );
+			helper.Set( "u_ModelNormal", renderable.NormalMatrix * mesh.Transform );
+
+			// Draw!
+			if ( mesh.UseElements )
+				glDrawElements( mesh.DrawMode, mesh.DrawCount, GL_UNSIGNED_INT, nullptr );
+			else
+				glDrawArrays( mesh.DrawMode, 0, mesh.DrawCount );
+		}
 	}
 }
 
@@ -95,17 +104,22 @@ void Rendering::DeferredPipeline::Render_Shadows( const RenderManifest& manifest
 
 	for ( const RenderableData& renderable : manifest.RenderList )
 	{
-		glBindVertexArray( renderable.Mesh.VertexObject );
+		for(uint32 i=0; i<renderable.Meshes.size(); ++i)
+		{
+			const MeshData& mesh = renderable.Meshes[i];
 
-		// Setup matrices
-		helper.Set( "u_Model", renderable.ModelMatrix );
-		helper.Set( "u_ModelNormal", renderable.NormalMatrix );
+			glBindVertexArray( mesh.VertexObject );
 
-		// Draw!
-		if ( renderable.Mesh.UseElements )
-			glDrawElements( renderable.Mesh.DrawMode, renderable.Mesh.DrawCount, GL_UNSIGNED_INT, nullptr );
-		else
-			glDrawArrays( renderable.Mesh.DrawMode, 0, renderable.Mesh.DrawCount );
+			// Setup matrices
+			helper.Set( "u_Model", renderable.ModelMatrix * mesh.Transform );
+			helper.Set( "u_ModelNormal", renderable.NormalMatrix * mesh.Transform );
+
+			// Draw!
+			if ( mesh.UseElements )
+				glDrawElements( mesh.DrawMode, mesh.DrawCount, GL_UNSIGNED_INT, nullptr );
+			else
+				glDrawArrays( mesh.DrawMode, 0, mesh.DrawCount );
+		}
 	}
 }
 

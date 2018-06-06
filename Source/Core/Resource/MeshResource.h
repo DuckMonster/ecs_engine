@@ -8,11 +8,10 @@ public:
 	bool Load(const FFile& file) override;
 	void Release() override;
 
-	const Rendering::MeshData& GetData() const { return m_Data; }
+	const std::vector<Rendering::MeshData>& GetData() const { return m_Data; }
 
 private:
-	Rendering::MeshData m_Data;
-	GLuint m_Buffers[4];
+	std::vector<Rendering::MeshData> m_Data;
 };
 
 #include "Core/Serialize/NamedArchive.h"

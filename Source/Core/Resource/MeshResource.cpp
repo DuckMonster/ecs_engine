@@ -17,79 +17,103 @@ bool MeshResource::Load(const FFile& file)
 		return false;
 	}
 
-	uint32 numVerts = 0;
-	uint32 numIndices = 0;
-	std::vector<glm::vec3> positionData;
-	std::vector<glm::vec3> normalData;
-	std::vector<glm::vec3> uvData;  // The uv data has 3 components, for cubemapped meshes?
-	std::vector<uint32> indexData;
+	m_Data.reserve(scene->mNumMeshes);
 
-	for(uint32 meshIndex=0; meshIndex<scene->mNumMeshes; ++meshIndex)
+	/* **** LOAD MESHES **** */
+	for(uint32 meshIndex = 0; meshIndex < scene->mNumMeshes; ++meshIndex)
 	{
 		aiMesh* mesh = scene->mMeshes[meshIndex];
 
-		GLuint meshVerts = mesh->mNumVertices;
-		positionData.resize(numVerts + meshVerts);
-		normalData.resize(numVerts + meshVerts);
-		uvData.resize(numVerts + meshVerts);
+		uint32 meshVerts = mesh->mNumVertices;
+		uint32 meshIndices = mesh->mNumFaces * 3;
 
-		memcpy(&positionData[numVerts], mesh->mVertices, sizeof(glm::vec3) * meshVerts);
+		glm::vec3* positionData = new glm::vec3[meshVerts];
+		glm::vec3* normalData = new glm::vec3[meshVerts];
+		glm::vec3* uvData = new glm::vec3[meshVerts];  // The uv data has 3 components, for cubemapped meshes?
+		uint32* indexData = new uint32[meshIndices];
+
+		memcpy(positionData, mesh->mVertices, sizeof(glm::vec3) * meshVerts);
 		
 		if (mesh->HasNormals())
-			memcpy(&normalData[numVerts], mesh->mNormals, sizeof(glm::vec3) * meshVerts);
+			memcpy(normalData, mesh->mNormals, sizeof(glm::vec3) * meshVerts);
 
 		if (mesh->HasTextureCoords(0))
-			memcpy(&uvData[numVerts], mesh->mTextureCoords[0], sizeof(glm::vec3) * meshVerts);
-
-		numVerts += meshVerts;
+			memcpy(uvData, mesh->mTextureCoords[0], sizeof(glm::vec3) * meshVerts);
 
 		// Fetch indexes
 		for(uint32 faceIndex = 0; faceIndex < mesh->mNumFaces; ++faceIndex)
 		{
 			const aiFace& face = mesh->mFaces[faceIndex];
-			Ensure(face.mNumIndices == 3);
+			Ensure(face.mNumIndices == 3);  // Right now we only support triangles
 
-			indexData.resize(numIndices + face.mNumIndices);
-
-			memcpy(&indexData[numIndices], face.mIndices, sizeof(uint32) * face.mNumIndices);
-			numIndices += face.mNumIndices;
+			memcpy(indexData + 3 * faceIndex, face.mIndices, sizeof(uint32) * 3);
 		}
+
+		Rendering::MeshData data;
+
+		glGenVertexArrays( 1, &data.VertexObject );
+		glGenBuffers( 4, data.Buffers);
+
+		// Upload and bind all the buffers
+		{
+			glBindVertexArray( data.VertexObject );
+
+			// Upload position
+			glBindBuffer( GL_ARRAY_BUFFER, data.Buffers[0] );
+			glBufferData( GL_ARRAY_BUFFER, sizeof( glm::vec3 ) * meshVerts, &positionData[0], GL_STATIC_DRAW );
+			glEnableVertexAttribArray( 0 );
+			glVertexAttribPointer( 0, 3, GL_FLOAT, false, 0, 0 );
+
+			// Upload normals
+			glBindBuffer( GL_ARRAY_BUFFER, data.Buffers[1] );
+			glBufferData( GL_ARRAY_BUFFER, sizeof( glm::vec3 ) * meshVerts, &normalData[0], GL_STATIC_DRAW );
+			glEnableVertexAttribArray( 1 );
+			glVertexAttribPointer( 1, 3, GL_FLOAT, false, 0, 0 );
+
+			// Upload UV
+			glBindBuffer( GL_ARRAY_BUFFER, data.Buffers[2] );
+			glBufferData( GL_ARRAY_BUFFER, sizeof( glm::vec3 ) * meshVerts, &uvData[0], GL_STATIC_DRAW );
+			glEnableVertexAttribArray( 2 );
+			glVertexAttribPointer( 2, 2, GL_FLOAT, false, sizeof( glm::vec3 ), 0 );
+
+			// Upload UV
+			glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, data.Buffers[3] );
+			glBufferData( GL_ELEMENT_ARRAY_BUFFER, sizeof( uint32 ) * meshIndices, &indexData[0], GL_STATIC_DRAW );
+
+			glBindVertexArray( 0 );
+		}
+
+		data.DrawMode = GL_TRIANGLES;
+		data.DrawCount = meshIndices;
+		data.UseElements = true;
+
+		m_Data.push_back(data);
 	}
 
-	glGenVertexArrays(1, &m_Data.VertexObject);
-	glGenBuffers(4, m_Buffers);
-
+	/* *** LOAD MESH TRANSFORMS *** */
 	{
-		glBindVertexArray(m_Data.VertexObject);
+		struct
+		{
+			void LoadNodeRecursive(aiNode* node, const glm::mat4& transform, std::vector<Rendering::MeshData>& meshList)
+			{
+				glm::mat4 newTransform = transform * transpose((*(glm::mat4*)&node->mTransformation));
 
-		// Upload position
-		glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[0]);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * numVerts, &positionData[0], GL_STATIC_DRAW);
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
+				// Set transforms of owned meshes
+				for(uint32 i=0; i<node->mNumMeshes; ++i)
+				{
+					meshList[node->mMeshes[i]].Transform = newTransform;
+				}
 
-		// Upload normals
-		glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[1]);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * numVerts, &normalData[0], GL_STATIC_DRAW);
-		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 3, GL_FLOAT, false, 0, 0);
+				// Do children
+				for(uint32 i=0; i<node->mNumChildren; ++i)
+				{
+					LoadNodeRecursive(node->mChildren[i], newTransform, meshList);
+				}
+			}
+		} nodeLoadHelper;
 
-		// Upload UV
-		glBindBuffer(GL_ARRAY_BUFFER, m_Buffers[2]);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * numVerts, &uvData[0], GL_STATIC_DRAW);
-		glEnableVertexAttribArray(2);
-		glVertexAttribPointer(2, 2, GL_FLOAT, false, sizeof(glm::vec3), 0);
-
-		// Upload UV
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_Buffers[3]);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint32) * numIndices, &indexData[0], GL_STATIC_DRAW);
-
-		glBindVertexArray(0);
+		nodeLoadHelper.LoadNodeRecursive(scene->mRootNode, glm::mat4(), m_Data);
 	}
-
-	m_Data.DrawMode = GL_TRIANGLES;
-	m_Data.DrawCount = numIndices;
-	m_Data.UseElements = true;
 
 	return true;
 }
@@ -98,10 +122,13 @@ bool MeshResource::Load(const FFile& file)
 *******************************************************************************/
 void MeshResource::Release()
 {
-	glDeleteVertexArrays(1, &m_Data.VertexObject);
-	glDeleteBuffers(3, m_Buffers);
+	for(Rendering::MeshData& data : m_Data)
+	{
+		glDeleteVertexArrays(1, &data.VertexObject);
+		glDeleteBuffers(4, data.Buffers);
+	}
 
-	Resource::Release();
+	m_Data.clear();
 }
 
 #include "ResourceManager.h"

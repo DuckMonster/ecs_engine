@@ -33,14 +33,18 @@ namespace Rendering
 	struct MeshData
 	{
 		GLuint VertexObject;
+		GLuint Buffers[4];
+
 		bool UseElements;
 		GLuint DrawCount;
 		GLenum DrawMode;
+
+		glm::mat4 Transform;
 	};
 
 	struct RenderableData
 	{
-		MeshData Mesh;
+		std::vector<MeshData> Meshes;
 		MaterialData Material;
 
 		glm::mat4 ModelMatrix;

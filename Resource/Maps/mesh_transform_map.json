@@ -1,0 +1,78 @@
+{
+	"name": "My Testmap",
+	"camera": "Camera",
+
+	"entities": 
+	[
+		{
+			"name": "AxisEntity",
+			"components": 
+			[
+				{
+					"type": "TransformComponent",
+					"Position": [ 0.0, 0.5, 0.0 ],
+					"Scale": [ 2.0, 2.0, 2.0 ]
+				},
+				{
+					"type": "RenderableComponent",
+					"Mesh": "/Resource/Mesh/cube.fbx",
+					"Material": "/Resource/Material/cubematerial.json"
+				}
+			]
+		},
+		{
+			"name": "ThirdEntity",
+			"components": 
+			[
+				{
+					"type": "TransformComponent",
+					"Position": [ 0.0, 3.0, 0.0 ],
+					"Scale": [ 0.05, 0.05, 0.05 ]
+				},
+				{
+					"type": "RenderableComponent",
+					"Mesh": "/Resource/Mesh/low-poly-mill.fbx",
+					"Material": "/Resource/Material/cubematerial.json"
+				}
+			]
+		},
+		{
+			"name": "Ground",
+			"components": 
+			[
+				{
+					"type": "TransformComponent",
+					"Position": [ 0.0, -0.5, 0.0 ],
+					"Rotation": [ 0.0, 0.0, 0.0 ],
+					"Scale": [ 20.0, 20.0, 20.0 ]
+				},
+				{
+					"type": "RenderableComponent",
+					"Mesh": "/Resource/Mesh/plane.fbx",
+					"Material": "/Resource/Material/floormaterial.json"
+				}
+			]
+		},
+		{
+			"name": "Camera",
+			"components": 
+			[
+				{
+					"type": "TransformComponent",
+					"Position": [ 0.0, 0.0, 5.0 ],
+					"Rotation": [ 0.0, 90.0, 0.0 ]
+				},
+				{
+					"type": "CameraComponent",
+					"Far": 200.0,
+					"Near": -50.0,
+					"Perspective": false
+				},
+				{
+					"type": "BehaviourComponent",
+					"Script": "/Resource/Script/camerascript.as"
+				}
+			]
+		}
+	]
+}

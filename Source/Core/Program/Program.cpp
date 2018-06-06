@@ -19,7 +19,7 @@ Program::Program()
 
 	// Map
 	m_World = new World();
-	m_World->LoadMap("Resource/Maps/uvmap.json");
+	m_World->LoadMap("Resource/Maps/mesh_transform_map.json");
 }
 
 /**	Destructor

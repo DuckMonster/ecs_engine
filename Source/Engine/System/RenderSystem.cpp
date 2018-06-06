@@ -44,7 +44,7 @@ void RenderSystem::RunInternal(Entity* entity, const TransformComponent* transfo
 		return;
 
 	RenderableData data;
-	data.Mesh = mesh->GetData();
+	data.Meshes = mesh->GetData();
 	data.Material = material->GetData();
 
 	data.ModelMatrix = transform->GetMatrix();
@@ -69,9 +69,13 @@ void RenderSystem::UpdateCameraMatrices()
 	using namespace glm;
 	RenderManifest& manifest = m_RenderSingleton->m_CurrentManifest;
 	CameraComponent* camera = m_RenderSingleton->m_CurrentCamera;
+
+	if (!camera)
+		return;
+
 	TransformComponent* transform = camera->GetEntity()->GetComponent<TransformComponent>();
 
-	if (!Ensure(transform))
+	if (!transform)
 		return;
 
 	//--------------------------------------------------- View matrix

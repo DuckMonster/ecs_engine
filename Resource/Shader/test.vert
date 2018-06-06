@@ -17,6 +17,6 @@ void main()
 	gl_Position = u_Camera * world;
 
 	f_World = world.xyz;
-	f_Normal = normalize((u_ModelNormal * vec4(a_Normal, 1.0)).xyz);
+	f_Normal = normalize((u_Model * vec4(a_Normal, 0.0)).xyz);
 	f_UV = a_UV;
 }
