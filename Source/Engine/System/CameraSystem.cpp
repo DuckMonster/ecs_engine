@@ -50,7 +50,7 @@ void CameraSystem::RunInternal(Entity* entity, TransformComponent* transform, Ca
 	}
 
 	{
-		float ratio = (float)Context::GetInstance()->width / (float)Context::GetInstance()->height;
+		float ratio = (float)Context::Get()->GetWidth() / (float)Context::Get()->GetHeight();
 
 		if (camera->m_Perspective)
 		{

@@ -2,6 +2,8 @@
 #include "Component/RenderableComponent.h"
 #include "Component/TransformComponent.h"
 #include "Component/BehaviourComponent.h"
+#include "Component/InputComponent.h"
 #include "System/CameraSystem.h"
 #include "System/RenderSystem.h"
 #include "System/BehaviourSystem.h"
+#include "System/InputSystem.h"

@@ -2,17 +2,23 @@
 #include "Entity.h"
 #include "Core/Serialize/NamedArchive.h"
 #include "Core/Component/Component.h"
+#include "Core/World/World.h"
 
-Entity::Entity(const entity_id id, const FName& name) :
-	m_Id(id),
-	m_Name(name)
+/**	Constructor
+*******************************************************************************/
+Entity::Entity(World* world, const entity_id id, const FName& name) :
+	id(id), name(name), world(world)
 {
 }
 
+/**	Destructor
+*******************************************************************************/
 Entity::~Entity()
 {
 }
 
+/**	Add Component
+*******************************************************************************/
 Component* Entity::AddComponent(const ComponentType& type)
 {
 	if (!Ensure(type.IsValid()))
@@ -22,20 +28,35 @@ Component* Entity::AddComponent(const ComponentType& type)
 		return nullptr;
 
 	Component* comp = type.Make(this);
-	comp->Initialize();
+	comp->InitializeInternal();
+	componentList.push_back(comp);
 
-	m_ComponentList.push_back(comp);
+	world->AddPendingComponent(comp);
 
 	return comp;
 }
 
+/**	Get Component
+*******************************************************************************/
 Component* Entity::GetComponent(const ComponentType& type) const
 {
-	for (Component* comp : m_ComponentList)
+	for (Component* comp : componentList)
 	{
 		if (comp->Type() == type)
 			return comp;
 	}
 
 	return nullptr;
+}
+
+/**	Get Or Add Component
+*******************************************************************************/
+Component* Entity::GetOrAddComponent(const ComponentType& type)
+{
+	Component* comp = GetComponent(type);
+
+	if (comp)
+		return comp;
+
+	return AddComponent(type);
 }

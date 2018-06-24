@@ -17,9 +17,10 @@ using namespace glm;
 *******************************************************************************/
 World::World()
 {
-	m_SystemList.push_back(new CameraSystem(this));
-	m_SystemList.push_back(new RenderSystem(this));
-	m_SystemList.push_back(new BehaviourSystem(this));
+	systemList.push_back(new InputSystem(this));
+	systemList.push_back(new BehaviourSystem(this));
+	systemList.push_back(new CameraSystem(this));
+	systemList.push_back(new RenderSystem(this));
 }
 
 /**	Destructor
@@ -32,28 +33,10 @@ World::~World()
 *******************************************************************************/
 void World::DoFrame()
 {
-	//-------------------- Print frame rate
-	static float FRAME_TIMER = 0.f;
+	// Init components
+	StartPendingComponents();
 
-	if ((FRAME_TIMER += Time::FrameDelta()) > 1.f)
-	{
-		FRAME_TIMER = 0.f;
-		//Debug_Log("Hello World, MS = %f", delta);
-		//PrintWorld();
-	}
-
-#if DEBUG
-	static float UPDATE_TIMER = 0.f;
-
-	if ((UPDATE_TIMER += Time::FrameDelta()) > 0.5f)
-	{
-		//if (m_MapResource->HasChanged())
-		//	LoadFromResource();
-
-		//UPDATE_TIMER = 0.f;
-	}
-#endif
-
+	// Run systems
 	RunSystems();
 }
 
@@ -67,12 +50,12 @@ Entity* World::CreateEntity(FName& name)
 	Ensure(id != MAX_ENTITY);
 
 #if DEBUG
-	Ensure(m_EntityLookup[id] == nullptr);
+	Ensure(entityLookup[id] == nullptr);
 #endif
 
-	Entity* newEntity = new Entity(id, name);
-	m_EntityList.push_back(newEntity);
-	m_EntityLookup[id] = newEntity;
+	Entity* newEntity = new Entity(this, id, name);
+	entityList.push_back(newEntity);
+	entityLookup[id] = newEntity;
 
 	Debug_Log("Entity [%d] created: \"%s\"", id, name.c_str());
 
@@ -83,14 +66,14 @@ Entity* World::CreateEntity(FName& name)
 *******************************************************************************/
 Entity* World::GetEntity(entity_id id)
 {
-	return m_EntityLookup[id];
+	return entityLookup[id];
 }
 
 /**	Find Entity
 *******************************************************************************/
 Entity* World::FindEntity(const FName& name)
 {
-	for (Entity* entity : m_EntityList)
+	for (Entity* entity : entityList)
 	{
 		if (entity->GetName() == name)
 			return entity;
@@ -104,16 +87,16 @@ Entity* World::FindEntity(const FName& name)
 void World::DestroyEntity(Entity* entity) { DestroyEntity(entity->GetId()); }
 void World::DestroyEntity(entity_id id)
 {
-	Entity* entity = m_EntityLookup[id];
+	Entity* entity = entityLookup[id];
 
 	if (!Ensure(entity))
 		return;
 
-	m_EntityLookup[id] = nullptr;
+	entityLookup[id] = nullptr;
 
-	std::vector<Entity*>::iterator it = std::find(m_EntityList.begin(), m_EntityList.end(), entity);
-	if (Ensure(it != m_EntityList.end()))
-		m_EntityList.erase(it);
+	std::vector<Entity*>::iterator it = std::find(entityList.begin(), entityList.end(), entity);
+	if (Ensure(it != entityList.end()))
+		entityList.erase(it);
 }
 
 /**	Map Resource Reloaded
@@ -121,6 +104,13 @@ void World::DestroyEntity(entity_id id)
 void World::MapResourceReloaded()
 {
 	LoadFromResource();
+}
+
+/**	Add Pending Component
+*******************************************************************************/
+void World::AddPendingComponent(Component* component)
+{
+	pendingComponentList.push_back(component);
 }
 
 /**	Load Map
@@ -136,6 +126,16 @@ void World::LoadMap(const char* path)
 	LoadFromResource();
 }
 
+/**	Start Pending Components
+*******************************************************************************/
+void World::StartPendingComponents()
+{
+	for(Component* component : pendingComponentList)
+		component->Start();
+
+	pendingComponentList.clear();
+}
+
 /**	Print World
 *******************************************************************************/
 void World::PrintWorld()
@@ -143,7 +143,7 @@ void World::PrintWorld()
 	Debug_Log("\n");
 	Debug_Log("--- WORLD DUMP\n");
 
-	for(Entity* entity : m_EntityList)
+	for(Entity* entity : entityList)
 	{
 		Debug_Log(entity->GetName().c_str());
 
@@ -158,7 +158,7 @@ void World::PrintWorld()
 *******************************************************************************/
 void World::RunSystems()
 {
-	for (ISystem* system : m_SystemList)
+	for (ISystem* system : systemList)
 	{
 		system->Run();
 	}
@@ -246,4 +246,19 @@ void World::LoadFromResource()
 	}
 
 	PrintWorld();
+}
+
+/**	Get Singleton Component
+*******************************************************************************/
+Component* World::GetSingletonComponent(ComponentType type)
+{
+	if (!m_AnonymousEntity)
+		m_AnonymousEntity = new Entity(this, 0, "[ANON]");
+
+	Component* component = m_AnonymousEntity->GetComponent(type);
+
+	if (!component)
+		component = m_AnonymousEntity->AddComponent(type);
+
+	return component;
 }

@@ -5,26 +5,6 @@
 	"entities": 
 	[
 		{
-			"name": "Tree",
-			"components": 
-			[
-				{
-					"type": "TransformComponent",
-					"Position": [ 0.0, 2.0, 0.0 ],
-					"Scale": [0.06, 0.06, 0.06]
-				},
-				{
-					"type": "RenderableComponent",
-					"Mesh": "/Resource/Mesh/low-poly-mill.fbx",
-					"Material": "/Resource/Material/cubematerial.json"
-				},
-				{
-					"type": "BehaviourComponent",
-					"Script": "/Resource/Script/rotatescript.as"
-				}
-			]
-		},
-		{
 			"name": "Ground",
 			"components": 
 			[
@@ -42,14 +22,14 @@
 			]
 		},
 		{
-			"name": "ThirdEntity",
+			"name": "Player",
 			"components": 
 			[
 				{
 					"type": "TransformComponent",
-					"Position": [ 0.0, 1.0, 0.0 ],
-					"Rotation": [ 90.0, 10.0, 42.0 ],
-					"Scale": [ 1.0, 1.0, 1.0 ]
+					"Position": [ 0.0, 0.5, 0.0 ],
+					"Rotation": [ 0.0, 0.0, 0.0 ],
+					"Scale": [ 1.0, 2.0, 1.0 ]
 				},
 				{
 					"type": "RenderableComponent",
@@ -57,8 +37,11 @@
 					"Material": "/Resource/Material/cubematerial.json"
 				},
 				{
-					"type": "BehaviourComponent",
-					"Script": "/Resource/Script/testscript.as"
+					"type": "InputComponent"
+				},
+				{
+					"type": "EmilTestComponent",
+					"speed": 5.0
 				}
 			]
 		},

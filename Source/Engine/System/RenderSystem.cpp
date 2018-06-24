@@ -107,7 +107,7 @@ void RenderSystem::UpdateCameraMatrices()
 
 	//--------------------------------------------------- Projection matrix
 	{
-		float ratio = (float)Context::GetInstance()->width / (float)Context::GetInstance()->height;
+		float ratio = (float)Context::Get()->GetWidth() / Context::Get()->GetHeight();
 
 		if (camera->m_Perspective)
 		{

@@ -1,15 +1,30 @@
 #pragma once
-#include "Core/Meta/MetaData.h"
 
 class Component;
 class Entity;
 
-_TYPE_DATABASE()
 class ComponentType
 {
 public:
 	typedef char id_t;
 	static const id_t INVALID_ID;
+
+	/* Structs used for binding component types, define these in the generated cpp files */
+	struct BindBase
+	{
+		virtual ComponentType& ToType() = 0;
+	};
+
+	template<typename TComp>
+	struct Bind : BindBase
+	{
+	public:
+		Bind(const char* name, id_t id);
+		ComponentType& ToType() override { return type; }
+
+	private:
+		ComponentType type;
+	};
 
 private:
 	//--------------------------------------------------- Make Functions
@@ -17,64 +32,58 @@ private:
 	template<class T>
 	static Component* DefaultMakeFunc(Entity* e) { return (Component*)new T(e); }
 
-	//--------------------------------------------------- Template Lookup
-	template<class TComp>
-	class TemplateLookup
-	{
-	public:
-		static ComponentType Type;
-	};
-
 	//--------------------------------------------------- Database
 public:
-	static void InitializeTypes();
-
+	// Getter functions
 	static const ComponentType& FromId(id_t id);
 	static const ComponentType& FromString(const char* name);
-	template<class TComp>
-	static const ComponentType& Get() { return TemplateLookup<TComp>::Type; }
 
 private:
-	static std::map<std::string, ComponentType> s_StringTypeMap;
-	static std::unordered_map<id_t, ComponentType> s_IdTypeMap;
+	// Inner database maps
+	static std::map<std::string, ComponentType>& GetStringTypeMap()
+	{
+		static std::map<std::string, ComponentType> StaticMap;
+		return StaticMap;
+	}
 
-	template<class TComp>
-	static void RegisterType(const char* name, id_t id);
+	static std::unordered_map<id_t, ComponentType>& GetIdTypeMap()
+	{
+		static std::unordered_map<id_t, ComponentType> StaticMap;
+		return StaticMap;
+	}
 
 	//--------------------------------------------------- Class
+
 public:
 	ComponentType() {}
-	ComponentType(const char* name, id_t id) : m_Name(name), m_Id(id) {}
 
-	id_t Id() const { return m_Id ; }
-	const char* Name() const { return m_Name; }
+protected:
+	ComponentType(const char* name, id_t id) : name(name), id(id) {}
 
-	bool IsValid() const { return m_Id != INVALID_ID; }
-	Component* Make(Entity* entity) const { if (Ensure(m_MakeFunc)) return m_MakeFunc(entity); return nullptr; }
+public:
+	id_t Id() const { return id ; }
+	const char* Name() const { return name; }
 
-	bool operator==(const ComponentType& other) const { return other.m_Id == m_Id; }
+	bool IsValid() const { return id != INVALID_ID; }
+	Component* Make(Entity* entity) const { if (Ensure(makeFunc)) return makeFunc(entity); return nullptr; }
+
+	bool operator==(const ComponentType& other) const { return other.id == id; }
 	bool operator!=(const ComponentType& other) const { return !(*this == other); }
 
 private:
-	id_t m_Id = INVALID_ID;
-	const char* m_Name = nullptr;
-	MakeFunc m_MakeFunc = nullptr;
+	id_t id = INVALID_ID;
+	const char* name = nullptr;
+	MakeFunc makeFunc = nullptr;
 };
 
-template<class TComp>
-void ComponentType::RegisterType(const char* name, id_t id)
+/**	Types get created and bound here
+*******************************************************************************/
+template<typename TComp>
+ComponentType::Bind<TComp>::Bind(const char* name, id_t id)
 {
-	static_assert(std::is_base_of<Component, TComp>::value, "Trying to register component with non-component template");
+	type = ComponentType(name, id);
+	type.makeFunc = DefaultMakeFunc<TComp>;
 
-	Debug_Log("Component \"%s\" registered with id [ %d ]", name, id);
-
-	ComponentType type(name, id);
-	type.m_MakeFunc = ComponentType::DefaultMakeFunc<TComp>;
-
-	s_StringTypeMap[name] = type;
-	s_IdTypeMap[id] = type;
-	TemplateLookup<TComp>::Type = type;
+	ComponentType::GetStringTypeMap()[name] = type;
+	ComponentType::GetIdTypeMap()[id] = type;
 }
-
-template<class TComp>
-ComponentType ComponentType::TemplateLookup<TComp>::Type;

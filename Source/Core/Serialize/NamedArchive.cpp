@@ -5,6 +5,7 @@
 
 using namespace rapidjson;
 
+
 /**	Open
 *******************************************************************************/
 NamedArchive::Source NamedArchive::Open(const char* path)
@@ -20,7 +21,7 @@ NamedArchive::Source NamedArchive::Open(const char* path)
 		return source;
 	}
 
-	ParseResult result = source.m_Document.Parse(jsonString.c_str());
+	ParseResult result = source.document.Parse(jsonString.c_str());
 	if (!result)
 		Debug_Log("Failed to parse JSON file \"%s\": %s (%d)\n", path, GetParseError_En(result.Code()), result.Offset());
 
@@ -31,21 +32,21 @@ NamedArchive::Source NamedArchive::Open(const char* path)
 *******************************************************************************/
 NamedArchive NamedArchive::Push(const char* name)
 {
-	return NamedArchive(m_Source, m_Pointer.Append(name));
+	return NamedArchive(source, pointer.Append(name));
 }
 
 /**	Push Index
 *******************************************************************************/
 NamedArchive NamedArchive::Push(uint32 index)
 {
-	return NamedArchive(m_Source, m_Pointer.Append(index));
+	return NamedArchive(source, pointer.Append(index));
 }
 
 /**	Is Array
 *******************************************************************************/
 bool NamedArchive::IsArray()
 {
-	Value* value = m_Pointer.Get(m_Source.m_Document);
+	Value* value = pointer.Get(source.document);
 	if (value == nullptr)
 		return false;
 
@@ -56,7 +57,7 @@ bool NamedArchive::IsArray()
 *******************************************************************************/
 uint32 NamedArchive::ArraySize()
 {
-	Value* value = m_Pointer.Get(m_Source.m_Document);
+	Value* value = pointer.Get(source.document);
 	if (value == nullptr)
 		return 0;
 
@@ -65,7 +66,13 @@ uint32 NamedArchive::ArraySize()
 
 bool NamedArchive::IsValid()
 {
-	return m_Pointer.Get(m_Source.m_Document) != nullptr;
+	return pointer.Get(source.document) != nullptr;
+}
+
+#define IMPL_TYPE(type) bool NamedArchive::Serialize(const char* name, type& value)
+IMPL_TYPE(glm::vec2)
+{
+	return SerializeArray<float>()
 }
 
 //--------------------------------------------------- Specializations!

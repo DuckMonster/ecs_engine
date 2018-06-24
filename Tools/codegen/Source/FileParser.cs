@@ -131,47 +131,6 @@ namespace CodeGenerator
 				manifest.Components.Add(comp);
 			}
 
-			// ----------------------------- Collect Database
-			match = TYPE_DB_RGX.Matches(file.Source);
-			if (match.Count > 0)
-			{
-				fileShouldBeGenerated = true;
-
-				TypeDatabase database = new TypeDatabase();
-				database.File = file;
-				database.ClassName = match[0].Groups[2].Value;
-
-				{
-					Function initFunction = new Function();
-					initFunction.Name = "InitializeTypes";
-					initFunction.ReturnType = "void";
-
-					database.InitFunction = initFunction;
-				}
-
-				{
-					Function regFunction = new Function();
-					regFunction.Name = "RegisterType";
-					regFunction.ReturnType = "void";
-
-					Parameter name = new Parameter(),
-						id = new Parameter();
-
-					name.Type = "const char*";
-					name.Name = "name";
-
-					id.Type = "id_t";
-					id.Name = "id";
-
-					regFunction.Arguments = new Parameter[] { name, id };
-
-					database.RegisterFunction = regFunction;
-				}
-
-				Utils.PrintVerbal("({0}) Parsed database \"{1}\"...", file.FileName, database.ClassName);
-				manifest.Database = database;
-			}
-
 			if (fileShouldBeGenerated)
 				file.IsDirty = GetFileIsDirty(file);
 		}

@@ -30,8 +30,8 @@ public:
 
 	bool Equals(const Resource* other) const;
 
-	Delegate<void> m_OnHotReloaded;
-	Delegate<void> m_OnReleased;
+	Delegate<> m_OnHotReloaded;
+	Delegate<> m_OnReleased;
 
 protected:
 	void AddDependency(Resource* other);

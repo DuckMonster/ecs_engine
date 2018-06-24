@@ -92,6 +92,7 @@ namespace CodeGenerator
 		public string Parent;
 		public string[] MetaData;
 		public string[] Namespaces;
+		public string GeneratedTypeBinder;
 		public Function[] Functions;
 		public Function[] GeneratedFunctions;
 		public Property[] Properties;
@@ -108,14 +109,6 @@ namespace CodeGenerator
 		}
 	}
 
-	class TypeDatabase
-	{
-		public SourceFile File;
-		public string ClassName;
-		public Function InitFunction;
-		public Function RegisterFunction;
-	}
-
 	class CodeGenerationManifest
 	{
 		//public string SourcePath;
@@ -123,7 +116,6 @@ namespace CodeGenerator
 		//public bool CanGenerate;
 
 		public List<Component> Components;
-		public TypeDatabase Database;
 
 		public void Print()
 		{
@@ -159,11 +151,6 @@ namespace CodeGenerator
 			}
 
 			Utils.PrintVerbal("\n\n");
-			Utils.PrintVerbal("- Database");
-			Utils.PrintVerbal("Class Name: {0}", Database.ClassName);
-			Utils.PrintVerbal("File: {0}", Database.File.FileName);
-			Utils.PrintVerbal("InitFunction: {0}", Database.InitFunction.Name);
-			Utils.PrintVerbal("RegisterFunction: {0}", Database.RegisterFunction.Name);
 		}
 	}
 }

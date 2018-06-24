@@ -34,7 +34,7 @@ FrameBuffer::~FrameBuffer()
 *******************************************************************************/
 void Rendering::FrameBuffer::CreateDownScaled( int scale )
 {
-	Create(Context::GetInstance()->width / scale, Context::GetInstance()->height / scale);
+	Create(Context::Get()->GetWidth() / scale, Context::Get()->GetHeight()/ scale);
 }
 
 /**	Create
@@ -191,7 +191,7 @@ void Rendering::FrameBufferScope::Release()
 	else
 	{
 		glBindFramebuffer( GL_FRAMEBUFFER, 0 );
-		glViewport( 0, 0, Context::GetInstance()->width, Context::GetInstance()->height );
+		glViewport( 0, 0, Context::Get()->GetWidth(), Context::Get()->GetHeight());
 		glDrawBuffers(1, DRAW_BUFFER_LIST);
 	}
 }

@@ -1,7 +1,9 @@
 #pragma once
-#include "../Entity/EntityUtils.h"
+#include "Core/Entity/EntityUtils.h"
+#include "Core/Component/ComponentType.h"
 
 class Entity;
+class Component;
 class ISystem;
 class Resource;
 
@@ -12,7 +14,9 @@ public:
 	~World();
 
 	void DoFrame();
-	const std::vector<Entity*>& GetEntities() const { return m_EntityList; }
+
+	// Entity stuff
+	const std::vector<Entity*>& GetEntities() const { return entityList; }
 
 	Entity* CreateEntity(FName& name);
 	Entity* GetEntity(entity_id id);
@@ -20,19 +24,29 @@ public:
 	void DestroyEntity(entity_id id);
 	void DestroyEntity(Entity* entity);
 
+	// Resource loading
 	void LoadMap(const char* path);
 	void MapResourceReloaded();
 
 private:
+	void LoadFromResource();
+
+	// Pending components (for next-frame start-up calling)
+public:
+	void AddPendingComponent(Component* component);
+private:
+	void StartPendingComponents();
+
+private:
+	// Debug print
 	void PrintWorld();
 	void RunSystems();
-
-	void LoadFromResource();
 
 	//--------------------------------------------------- Singleton stuff
 public:
 	template<class T>
-	T* GetSingletonComponent();
+	T* GetSingletonComponent() { return (T*)GetSingletonComponent(T::StaticType()); }
+	Component* GetSingletonComponent(ComponentType type);
 
 private:
 	Entity* m_AnonymousEntity = nullptr;
@@ -41,13 +55,12 @@ private:
 private:
 	entity_id m_LastEntityId = 0;
 
-	std::vector<Entity*> m_EntityList;
-	std::unordered_map<entity_id, Entity*> m_EntityLookup;
-	std::vector<ISystem*> m_SystemList;
+	std::vector<Entity*> entityList;
+	std::unordered_map<entity_id, Entity*> entityLookup;
+	std::vector<ISystem*> systemList;
+	std::vector<Component*> pendingComponentList;
 
 	//--------------------------------------------------- Map resource
 private:
 	Resource* m_MapResource = nullptr;
 };
-
-#include "World.inl"

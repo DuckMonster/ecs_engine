@@ -81,8 +81,6 @@ namespace CodeGenerator
 				Process.ProcessComponent(comp, manifest);
 			}
 
-			Process.ProcessDatabase(manifest.Database, manifest);
-
 			// Generate
 			if (GenData.CanGenerate)
 			{
@@ -124,18 +122,6 @@ namespace CodeGenerator
 
 					Utils.Print(comp.File.GenHeaderFileName);
 				}
-			}
-
-			using (FileStream fileStream = OpenSource(manifest.Database.File))
-			{
-				SourceWriter writer = new SourceWriter(manifest.Database.File, fileStream);
-
-				writer.WriteDatabase(manifest.Database, manifest);
-
-				writer.Flush();
-				writer.Close();
-
-				Utils.Print(manifest.Database.File.GenSrcFileName);
 			}
 
 			Utils.Print("-- GENERATION DONE --");

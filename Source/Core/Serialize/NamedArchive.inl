@@ -5,9 +5,9 @@ template<typename T>
 bool NamedArchive::Serialize(const char* name, T& value)
 {
 	using namespace rapidjson;
-	Pointer ptr = m_Pointer.Append(name);
+	Pointer ptr = pointer.Append(name);
 
-	Value* valuePtr = ptr.Get(m_Source.m_Document);
+	Value* valuePtr = ptr.Get(source.document);
 	if (!valuePtr)
 		return false;
 
@@ -25,8 +25,8 @@ bool NamedArchive::Serialize(const char* name, T& value)
 template<typename T>
 bool NamedArchive::SerializeArray(const char* name, T* arrayPtr, uint32 count)
 {
-	rapidjson::Pointer ptr = m_Pointer.Append(name);
-	rapidjson::Value* valuePtr = m_Pointer.Append(name).Get(m_Source.m_Document);
+	rapidjson::Pointer ptr = pointer.Append(name);
+	rapidjson::Value* valuePtr = pointer.Append(name).Get(source.document);
 
 	if (!valuePtr)
 		return false;
@@ -52,8 +52,8 @@ bool NamedArchive::SerializeArray(const char* name, T* arrayPtr, uint32 count)
 template<typename T>
 bool NamedArchive::SerializeArray( const char* name, std::vector<T>& value )
 {
-	rapidjson::Pointer ptr = m_Pointer.Append(name);
-	rapidjson::Value* valuePtr = m_Pointer.Append(name).Get(m_Source.m_Document);
+	rapidjson::Pointer ptr = pointer.Append(name);
+	rapidjson::Value* valuePtr = pointer.Append(name).Get(source.document);
 
 	if (!valuePtr)
 		return false;

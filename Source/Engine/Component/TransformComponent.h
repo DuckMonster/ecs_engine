@@ -10,12 +10,14 @@ class TransformComponent : public Component
 public:
 	TransformComponent(Entity* entity) : Component(entity) {}
 
+	void Translate(const glm::vec3& delta) { SetPosition(m_Position + delta); }
 	void SetPosition(const glm::vec3& position) { m_Position = position; }
 	const glm::vec3& GetPosition() const { return m_Position; }
 
 	void SetScale(const glm::vec3& scale) { m_Scale = scale; }
 	const glm::vec3& GetScale() const { return m_Scale; }
 
+	void Rotate(const glm::quat& rotation) { SetRotation(m_Rotation * rotation); }
 	void SetRotation(const glm::quat& rotation) { m_Rotation = rotation; }
 	const glm::quat& GetRotation() const { return m_Rotation; }
 

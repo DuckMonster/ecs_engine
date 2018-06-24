@@ -3,6 +3,8 @@
 #include "BehaviourComponent.gen.h"
 #include "Core/Resource/ScriptResource.h"
 
+#define BIND_BEHAVIOUR(function) BIND_BASE(BehaviourComponent, OnUpdate, function)
+
 COMPONENT(Core)
 class BehaviourComponent : public Component
 {
@@ -10,7 +12,5 @@ class BehaviourComponent : public Component
 
 public:
 	BehaviourComponent(Entity* entity) : Component(entity) {}
-
-	PROPERTY(Serialize)
-	ScriptResource* m_Script = nullptr;
+	Delegate<> OnUpdate;
 };

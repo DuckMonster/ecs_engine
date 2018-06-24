@@ -41,17 +41,10 @@ namespace CodeGenerator
 			WriteLine(FUNC, func.Implemenatation(className), source);
 		}
 
-		public void WriteDatabase(TypeDatabase db, CodeGenerationManifest manifest)
-		{
-			// Include all component files
-			foreach(Component comp in manifest.Components)
-				WriteInclude(comp.File.FullPath);
-
-			WriteFunction(db.InitFunction, db.ClassName, db.InitFunction.Source);
-		}
-
 		public void WriteComponent(Component component)
 		{
+			WriteLine(component.GeneratedTypeBinder);
+
 			if (component.Functions != null)
 			{
 				foreach (Function func in component.Functions)

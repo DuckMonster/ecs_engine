@@ -1,56 +1,76 @@
 #pragma once
 #include <rapidjson/document.h>
 #include <rapidjson/pointer.h>
+#include "Archive.h"
 
-class NamedArchive
+#define DEFAULT_TYPE(type) bool Serialize(const char* name, type& value) override { SerializeDefault<type>(name, value); }
+#define DEFINE_TYPE(type) bool Serialize(const char* name, type& value) override
+
+class NamedArchive : public IArchive
 {
 public:
 	struct Source
 	{
-		rapidjson::Document m_Document;
+		rapidjson::Document document;
 	};
 	static Source Open(const char* path);
 
 public:
-	NamedArchive(Source& source) : m_Source(source), m_Pointer() {}
+	NamedArchive(Source& source) : source(source), pointer() {}
 private:
 	NamedArchive(Source& source, rapidjson::Pointer pointer) :
-		m_Source(source), m_Pointer(pointer) {}
+		source(source), pointer(pointer) {}
 
 public:
-	template<typename T>
-	bool Serialize(const char* name, T& value);
+	// Default types 
+	DEFAULT_TYPE(int8);
+	DEFAULT_TYPE(uint8);
+	DEFAULT_TYPE(int16);
+	DEFAULT_TYPE(uint16);
+	DEFAULT_TYPE(int32);
+	DEFAULT_TYPE(uint32);
+	DEFAULT_TYPE(float);
+	DEFAULT_TYPE(double);
+	DEFAULT_TYPE(char*);
 
-	template<typename T>
-	bool SerializeArray(const char* name, T* arrayPtr, uint32 count);
-
-	template<typename T>
-	bool SerializeArray(const char* name, std::vector<T>& value);
+	// Special types
+	DEFINE_TYPE(glm::vec2);
+	DEFINE_TYPE(glm::vec3);
+	DEFINE_TYPE(glm::vec4);
+	DEFINE_TYPE(glm::quat);
+	DEFINE_TYPE(std::string);
 
 	NamedArchive Push(const char* name);
 	NamedArchive Push(uint32 index);
+
+	template<typename T>
+	bool SerializeArray(const char* name, std::vector<T>& value);
 
 	bool IsArray();
 	uint32 ArraySize();
 	bool IsValid();
 
 private:
-	Source& m_Source;
-	rapidjson::Pointer m_Pointer;
+	// Default serialization that rapidjson can handle
+	template<typename T>
+	bool SerializeDefault(const char* name, T& value)
+	{
+		rapidjson::Value* jsonValue = pointer.Get(source.document);
+		if (!jsonValue)
+			return false;
+
+		if (!Ensure(jsonValue->Is<T>()))
+			return false;
+
+		value = jsonValue->Get<T>();
+		return false;
+	}
+
+	Source& source;
+	rapidjson::Pointer pointer;
 };
 
-// Some default serialize specializations
-//--------------------------------------------------- 
-template<>
-bool NamedArchive::Serialize<std::string>(const char* name, std::string& value);
-template<>
-bool NamedArchive::Serialize<glm::vec2>(const char* name, glm::vec2& value);
-template<>
-bool NamedArchive::Serialize<glm::vec3>(const char* name, glm::vec3& value);
-template<>
-bool NamedArchive::Serialize<glm::vec4>(const char* name, glm::vec4& value);
-template<>
-bool NamedArchive::Serialize<glm::quat>(const char* name, glm::quat& value);
-//--------------------------------------------------- 
+#undef DEFAULT_TYPE
+#undef DEFINE_TYPE
 
 #include "NamedArchive.inl"

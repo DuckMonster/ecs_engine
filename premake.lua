@@ -35,7 +35,7 @@ project "Game"
 		["Resource/*"] = { "Resource/* "}
 	}
 
-	-- systemversion "10.0.16299.0"
+	systemversion "10.0.17134.0"
 
 	objdir "Build/obj/"
 	targetsuffix "_%{cfg.buildcfg}"

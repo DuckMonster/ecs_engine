@@ -37,6 +37,15 @@ namespace CodeGenerator
 
 			List<Function> generatedFunctions = new List<Function>();
 
+			//---------- Type binder
+			{
+				StringWriter sourceWriter = new StringWriter();
+				sourceWriter.WriteLine("namespace {");
+				sourceWriter.WriteLine("ComponentType::Bind<{0}> {0}_BIND( \"{0}\", {1} );", comp.Name, comp.Id);
+				sourceWriter.WriteLine("}");
+				comp.GeneratedTypeBinder = sourceWriter.ToString();
+			}
+
 			//---------- Serialize Function
 			if (!comp.HasUserSerialize)
 			{
@@ -62,40 +71,26 @@ namespace CodeGenerator
 			//---------- Initialize function
 			{
 				StringWriter sourceWriter = new StringWriter();
-				sourceWriter.WriteLine("{0}::Initialize();", comp.Parent, comp.Id);
-				sourceWriter.WriteLine("m_Type = {0}::FromId( {1} );", manifest.Database.ClassName, comp.Id);
+				sourceWriter.WriteLine("{0}::InitializeInternal();", comp.Parent, comp.Id);
+				sourceWriter.WriteLine("m_Type = StaticType();");
 
 				foreach (Property prop in comp.Properties)
 					sourceWriter.WriteLine("RegisterProperty<{0}>( \"{1}\", &{2} );", prop.Parameter.Type, prop.CleanName, prop.Parameter.Name);
 
 				initializeSource = sourceWriter.ToString();
-				generatedFunctions.Add(ConstructFunction("public", "void", "Initialize", "", "override", initializeSource));
+				generatedFunctions.Add(ConstructFunction("public", "void", "InitializeInternal", "", "override", initializeSource));
 			}
 
 			//---------- Static Type function
 			{
 				StringWriter sourceWriter = new StringWriter();
-				sourceWriter.WriteLine("static ComponentType STATIC_TYPE( \"{0}\", {1} );", comp.Name, comp.Id);
-				sourceWriter.WriteLine("return STATIC_TYPE;");
+				sourceWriter.WriteLine("return {0}_BIND.ToType();", comp.Name);
 
 				staticTypeSource = sourceWriter.ToString();
 				generatedFunctions.Add(ConstructFunction("public", "const ComponentType&", "StaticType", "static", "", staticTypeSource));
 			}
 
 			comp.GeneratedFunctions = generatedFunctions.ToArray();
-		}
-
-		public static void ProcessDatabase(TypeDatabase database, CodeGenerationManifest manifest)
-		{
-			const string REGISTER_FORMAT = "{0}<{1}>( \"{1}\", {2} );";
-			StringWriter sourceWriter = new StringWriter();
-
-			foreach(Component comp in manifest.Components)
-			{
-				sourceWriter.WriteLine(REGISTER_FORMAT, database.RegisterFunction.Name, comp.Name, comp.Id);
-			}
-
-			database.InitFunction.Source = sourceWriter.ToString();
 		}
 	}
 }

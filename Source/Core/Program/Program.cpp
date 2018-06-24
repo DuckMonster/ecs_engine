@@ -11,15 +11,19 @@
 *******************************************************************************/
 Program::Program()
 {
-	// Init components
-	ComponentType::InitializeTypes();
-
 	// Init render pipeline
 	Rendering::IRenderPipeline::Create<Rendering::DeferredPipeline>();
 
 	// Map
 	m_World = new World();
-	m_World->LoadMap("Resource/Maps/mesh_transform_map.json");
+	m_World->LoadMap("Resource/Maps/testmap.json");
+
+	// Escape is quit
+	Context::Get()->OnKeyAction.BindLambda([](Key key, KeyAction action)
+	{
+		if (key == Key::Escape && action == KeyAction::Pressed)
+			Context::Get()->Close();
+	});
 }
 
 /**	Destructor
@@ -42,4 +46,3 @@ void Program::DoFrame()
 	// Run world
 	m_World->DoFrame();
 }
-
